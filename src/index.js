@@ -1,9 +1,10 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
-require('dotenv').config();
-const pool = require("./db");
+import express from "express";
+import bcrypt from "bcrypt";
+import cors from "cors";
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+dotenv.config()
+import pool from "./db/db.js";
 
 const app = express();
 const PORT = 3001;
