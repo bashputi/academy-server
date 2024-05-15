@@ -9,6 +9,17 @@ CREATE TABLE student (
      email VARCHAR(200) UNIQUE,
     role VARCHAR(50),
     date DATE NOT NULL DEFAULT CURRENT_DATE,
+    otp VARCHAR(10),
+    skill VARCHAR(200),
+    phone VARCHAR(50),
+    profileimage TEXT,
+    coverimage TEXT,
+    facebook TEXT,
+    twitter TEXT,
+    linkedin TEXT,
+    website TEXT,
+    github TEXT,
+    bio TEXT,
     UNIQUE (id)
 );
 

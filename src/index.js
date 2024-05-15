@@ -11,8 +11,10 @@ app.use(cors());
 
 
 import userRouter from './routes/user.router.js';
+import settingRouter from './routes/settings.route.js';
 
 app.use("/user", userRouter)
+app.use("/user", settingRouter)
 
 
 

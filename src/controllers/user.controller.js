@@ -105,56 +105,50 @@ const login = async(req, res) => {
     try {
         let {email, password} = req.body;
         console.log({email, password})
-        pool.query(`SELECT * FROM student WHERE email = $1`,[email],
-            async(err, results) => {
-                if(err){throw err; }
-                if(results.rows.length > 0){
-                const user = results.rows[0];
-
-               bcrypt.compare(password, user.password, async(err, isMatch) => {
-                if(err){
-                    console.log("pass not compared", err);
+        pool.query(
+            `SELECT * FROM student WHERE email = $1 OR username = $1`,
+            [email],
+            async (err, results) => {
+                if (err) {
+                    throw err;
                 }
-                if(isMatch){
-                    const otp = generateOTP();
-                    console.log(otp)
-                    const addColumnsQuery = `
-                    DO $$
-                    BEGIN
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'student' AND column_name = 'otp') THEN
-                            ALTER TABLE student ADD COLUMN otp TEXT;
-                        END IF;
-                    END
-                    $$;
-                `;
-                await pool.query(addColumnsQuery);
-                const updateQuery = {
-                    text: `UPDATE student 
-                           SET otp = COALESCE($1, otp)
-                           WHERE email = $2
-                           RETURNING *`,
-                    values: [otp, email],
-                };
-                const result = await pool.query(updateQuery);
-                if (result.rows.length > 0) {
-                    await sendOTP(email, otp);
-                   res.status(200).json({
-                        status: 201,
-                        success: true,
-                        message: "Verify OTP for Vrification",
-                      });
-                      return 
+                if (results.rows.length > 0) {
+                    const user = results.rows[0];
+        
+                    bcrypt.compare(password, user.password, async (err, isMatch) => {
+                        if (err) {
+                            console.log("Error comparing passwords:", err);
+                            return res.status(400).json({ status: 400, message: "Server error" });
+                        }
+                        if (isMatch) {
+                            const otp = generateOTP();
+                            console.log(otp);
+                           
+                            const updateQuery = {
+                                text: `UPDATE student 
+                                       SET otp = COALESCE($1, otp)
+                                       WHERE email = $2
+                                       RETURNING *`,
+                                values: [otp, user.email],
+                            };
+                            const result = await pool.query(updateQuery);
+                            if (result.rows.length > 0) {
+                                await sendOTP(user.email, otp);
+                                return res.status(200).json({
+                                    status: 200,
+                                    success: true,
+                                    message: "Verify OTP for Verification",
+                                });
+                            }
+                        } else {
+                            return res.status(400).json({ status: 400, message: "Password is incorrect" });
+                        }
+                    });
+                } else {
+                    return res.status(400).json({ status: 400, message: "Email or username does not exist" });
                 }
-             }else{
-                    res.status(400).json({status: 400,message: "password is incorrect" });
-                  return;
-                }
-               })
-                }else{res.status(400).json({status: 400,
-                        message: "Email does not exist!!",});
-                      return;
-                }
-            });  
+            }
+        );
     } catch (error) {
         res.status(400).json({ error: error.message });;
     }  
@@ -165,19 +159,27 @@ const verifyOtp = async(req, res) => {
     try {
         const { email, otp } = req.body;
         console.log({ email, otp } )
-        pool.query("SELECT * FROM student WHERE email = $1 AND otp = $2", [email, otp], async (err, results) => {
-          if (err) {
-            throw err;
-          }
-          if (results.rows.length > 0) {
-            const user = results.rows[0];
-            console.log(user)
-            const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-            res.status(200).json({ token, success: true, message: "Logged in Successfully" });
-          } else {
-            res.status(400).json({ status: 400, message: "OTP verification failed" });
-          }
-        });
+        pool.query("SELECT * FROM student WHERE email = $1 OR username = $1 AND otp = $2", [email, otp], async (err, results) => {
+            if (err) {
+              throw err;
+            }
+            if (results.rows.length > 0) {
+              const user = results.rows[0];
+
+              const token = jwt.sign({
+                firstname: user.firstname,
+                lastname: user.lastname,
+                username: user.username,
+                 email: user. email,
+                 role: user.role,
+                 date: user.date
+              } , secretKey, { expiresIn: '30day' });
+
+              res.status(200).json({ token, success: true, message: "Logged in Successfully" });
+            } else {
+              res.status(400).json({ status: 400, message: "OTP verification failed" });
+            }
+          });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
