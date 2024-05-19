@@ -1,8 +1,6 @@
-
 import { Router } from "express";
 import { profile, image, coverimage, profileimage, resetPassword, socialProfile} from "../controllers/settings.controller.js";
 const router = Router();
-
 
 
  router.route("/profile/:id").patch(profile);
@@ -11,11 +9,6 @@ const router = Router();
  router.route("/profilepic/:id").delete(profileimage);
  router.route("/resetpassword/:id").patch(resetPassword);
  router.route("/socialProfile/:id").patch(socialProfile);
-
-
-
-
-
 
 
 

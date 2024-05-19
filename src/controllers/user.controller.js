@@ -269,6 +269,29 @@ const socialLogin = async(req, res) => {
     }
 };
 
+// get specific user information 
+const user = async(req, res) => {
+    try {
+        const { id } = req.params;
+        const users = await pool.query('SELECT * FROM student WHERE id = $1', [id]);
+        res.status(200).json({message: "Specific user is returned", data: users.rows });
+    } catch (error) {
+        res.json({error: error.message});
+    }
+};
+
+// get user information 
+const students = async(req, res) => {
+    try {
+        console.log('result.rows')
+        const result = await pool.query('SELECT * FROM student WHERE role = $1', ['student']);
+        console.log(result.rows)
+        res.json({ message: 'Students are returned', data: result.rows });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+};
+
 
 
 
@@ -277,5 +300,6 @@ export {
     login,
     verifyOtp,
     socialLogin,
-
+    students,
+    user,
 };

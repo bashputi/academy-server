@@ -23,8 +23,23 @@ CREATE TABLE student (
     UNIQUE (id)
 );
 
-DELETE FROM users;
+CREATE TABLE courses (
+    id VARCHAR(255) PRIMARY KEY,
+    title TEXT,
+    categories TEXT,
+    details TEXT,
+    QNA BOOLEAN,
+    resourses TEXT,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    level VARCHAR(30),
+    limited VARCHAR(30),
+    author TEXT,
+    image TEXT,
+    UNIQUE (id)
+);
 
-SELECT * FROM users;
+DELETE FROM student;
 
-DROP TABLE users;
+SELECT * FROM student;
+
+DROP TABLE student;
