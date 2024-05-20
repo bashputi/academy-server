@@ -138,13 +138,6 @@ const socialProfile = async(req, res) => {
 
 
 
-
-
-
-
-
-
-
 export {
     profile,
     image,

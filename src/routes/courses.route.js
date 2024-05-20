@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { course, allCourses, specificCourses,
     deleteCourses, editCourses, statusCourses,
-    enrollCourses
+    enrollCourses, getEnroll
 } from "../controllers/courses.controller.js";
 const router = Router();
 
@@ -13,7 +13,7 @@ const router = Router();
  router.route("/editcourse/:id").patch(editCourses); 
  router.route("/statuscourse/:id").patch(statusCourses); 
  router.route("/enroll").post(enrollCourses); 
-
+ router.route("/get/enroll").get(getEnroll); 
 
 
 

@@ -42,12 +42,13 @@ CREATE TABLE courses (
 
 CREATE TABLE enroll (
     id VARCHAR(255) PRIMARY KEY,
-    status VARCHAR(20),
-    price VARCHAR(30),
-    title TEXT,
-    categories TEXT,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
-    author TEXT,
+    studentId VARCHAR(200),
+    studentName VARCHAR(200),
+    studentEmail VARCHAR(200),
+    courseId VARCHAR(200),
+    courseTitle TEXT,
+    coursePrice VARCHAR(30),
     UNIQUE (id)
 );
 
