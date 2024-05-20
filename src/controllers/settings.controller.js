@@ -99,7 +99,7 @@ const resetPassword = async(req, res) => {
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating password:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(400).json({ error: 'Internal server error' });
     }
 };
 

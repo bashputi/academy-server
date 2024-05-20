@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, login, verifyOtp, socialLogin, students, user} from "../controllers/user.controller.js";
+import { registerUser, login, verifyOtp, socialLogin, students, user, } from "../controllers/user.controller.js";
 const router = Router();
 
 
@@ -10,6 +10,7 @@ const router = Router();
  router.route("/social-login").post(socialLogin);
  router.route("/students").get(students);
  router.route("/:id").get(user);
+
 
 
 

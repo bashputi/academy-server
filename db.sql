@@ -25,6 +25,8 @@ CREATE TABLE student (
 
 CREATE TABLE courses (
     id VARCHAR(255) PRIMARY KEY,
+    status VARCHAR(20),
+    price VARCHAR(30),
     title TEXT,
     categories TEXT,
     details TEXT,
@@ -32,9 +34,20 @@ CREATE TABLE courses (
     resourses TEXT,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     level VARCHAR(30),
-    limited VARCHAR(30),
+    studentlimit VARCHAR(30),
     author TEXT,
     image TEXT,
+    UNIQUE (id)
+);
+
+CREATE TABLE enroll (
+    id VARCHAR(255) PRIMARY KEY,
+    status VARCHAR(20),
+    price VARCHAR(30),
+    title TEXT,
+    categories TEXT,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    author TEXT,
     UNIQUE (id)
 );
 
@@ -42,4 +55,4 @@ DELETE FROM student;
 
 SELECT * FROM student;
 
-DROP TABLE student;
+DROP TABLE courses;

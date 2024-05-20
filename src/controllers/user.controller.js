@@ -203,33 +203,20 @@ const socialLogin = async(req, res) => {
                 }
                 if (results && results.rows.length > 0) {
                     const user = results.rows[0];
-                    console.log(user)
                     bcrypt.compare(password, user.password, async(err, isMatch) => {
                         if (err) {
                             console.log("Error comparing password", err);
                             return res.status(400).json({ error: 'Server error occurred' });
                         }
                         if (isMatch) {
-                            const otp = generateOTP();
-                    console.log(otp)   
-                const updateQuery = {
-                    text: `UPDATE student 
-                           SET otp = COALESCE($1, otp)
-                           WHERE email = $2
-                           RETURNING *`,
-                    values: [otp, email],
-                };
-                const result = await pool.query(updateQuery);
-                if (result.rows.length > 0) {
-                    await sendOTP(email, otp);
-                   res.status(200).json({
-                        status: 201,
+                      res.status(200).json({
+                        status: 200,
                         success: true,
-                        message: "Verify OTP for Vrification",
+                        message: "Verified user",
                       });
                       return 
-                }
-                        } else {
+                      }
+                        else {
                             return res.status(400).json({
                                 status: 400,
                                 message: "Email already used!!",
@@ -237,12 +224,10 @@ const socialLogin = async(req, res) => {
                         }
                     });
                 } else {
-                    const otp = generateOTP();
-                    console.log(otp)
                     pool.query(
-                        `INSERT INTO student (id, firstname, lastname, username, email, password, role, otp)
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role, otp],
+                        `INSERT INTO student (id, firstname, lastname, username, email, password, role)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7)
+                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
                         async(err, results) => {
                             if (err) {
                                 console.log("Error inserting user", err);
@@ -250,12 +235,11 @@ const socialLogin = async(req, res) => {
                             }
                             if (results.rows.length > 0) {
                                 const user = results.rows[0];
-                                console.log(user.email)
-                                await sendOTP(user.email, otp);
+                  
                                res.status(200).json({
-                                    status: 201,
+                                    status: 200,
                                     success: true,
-                                    message: "Verify OTP for Vrification",
+                                    message: "Create user",
                                   });
                                   return 
                             }
@@ -274,7 +258,7 @@ const user = async(req, res) => {
     try {
         const { id } = req.params;
         const users = await pool.query('SELECT * FROM student WHERE id = $1', [id]);
-        res.status(200).json({message: "Specific user is returned", data: users.rows });
+        res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
     } catch (error) {
         res.json({error: error.message});
     }
@@ -283,7 +267,6 @@ const user = async(req, res) => {
 // get user information 
 const students = async(req, res) => {
     try {
-        console.log('result.rows')
         const result = await pool.query('SELECT * FROM student WHERE role = $1', ['student']);
         console.log(result.rows)
         res.json({ message: 'Students are returned', data: result.rows });
@@ -295,6 +278,9 @@ const students = async(req, res) => {
 
 
 
+
+
+
 export {
     registerUser,
     login,
@@ -302,4 +288,5 @@ export {
     socialLogin,
     students,
     user,
+    
 };
