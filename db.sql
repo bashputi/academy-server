@@ -67,6 +67,17 @@ CREATE TABLE wishlist (
     UNIQUE (id)
 );
 
+CREATE TABLE categories (
+    id VARCHAR(255) PRIMARY KEY,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    authorId VARCHAR(200),
+    icone TEXT,
+    Title TEXT,
+    UNIQUE (id)
+);
+
+
+
 ALTER TABLE enroll
 ADD COLUMN complete VARCHAR(20);
 
