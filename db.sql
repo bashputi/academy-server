@@ -76,6 +76,15 @@ CREATE TABLE categories (
     UNIQUE (id)
 );
 
+CREATE TABLE announcement (
+    id VARCHAR(255) PRIMARY KEY,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    course_name Text,
+    Title TEXT,
+    summary TEXT,
+    UNIQUE (id)
+);
+
 
 
 ALTER TABLE enroll

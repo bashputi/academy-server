@@ -16,6 +16,7 @@ import instructorRoute from './routes/instructor.route.js';
 import enrollRoute from './routes/enroll.route.js';
 import wishlistRoute from './routes/wishlist.route.js';
 import categoriesRoute from './routes/categories.route.js';
+import announcementRoute from './routes/announcement.route.js';
 
 app.use("/user", userRouter)
 app.use("/user", settingRouter)
@@ -24,6 +25,7 @@ app.use("/instructor", instructorRoute)
 app.use("/student", enrollRoute)
 app.use("/student", wishlistRoute)
 app.use("/admin", categoriesRoute)
+app.use("/admin", announcementRoute)
 
 
 
