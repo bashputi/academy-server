@@ -14,11 +14,15 @@ import userRouter from './routes/user.router.js';
 import settingRouter from './routes/settings.route.js';
 import coursesRoute from './routes/courses.route.js';
 import instructorRoute from './routes/instructor.route.js';
+import enrollRoute from './routes/enroll.route.js';
+import wishlistRoute from './routes/wishlist.route.js';
 
 app.use("/user", userRouter)
 app.use("/user", settingRouter)
-app.use("/user", coursesRoute)
-app.use("/user", instructorRoute)
+app.use("/admin", coursesRoute)
+app.use("/instructor", instructorRoute)
+app.use("/student", enrollRoute)
+app.use("/student", wishlistRoute)
 
 
 

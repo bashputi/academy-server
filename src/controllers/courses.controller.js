@@ -4,17 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 // add a course 
 const course = async(req, res) => {
     try {
-        const { status, price, title, categories, details, QNA, resourses, date, level, studentlimit, author, image} = req.body;
+        const { status, price, title, categories, details, QNA, resourses, date, level, studentlimit, author, image, authorId} = req.body;
         const id = uuidv4();
-        console.log({ status, price, title, categories, details, QNA, resourses, date, level, studentlimit, author, image });
-        
-        pool.query('INSERT INTO courses (id, status, price, title, categories, details, QNA, resourses, level, studentlimit, author, image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *', [id, status, price, title, categories, details, QNA, resourses, level, studentlimit, author, image],
+        pool.query('INSERT INTO courses (id, status, price, title, categories, details, QNA, resourses, level, studentlimit, author, image, authorId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *', [id, status, price, title, categories, details, QNA, resourses, level, studentlimit, author, image, authorId],
         (error, result) => {
             if (error) {
-                console.error('Error executing query:', error);
                 return res.status(201).json({ message: 'Failed to add course' });
             } else {
-                console.log('Inserted course:', result.rows[0]);
                 return res.status(200).json({ message: 'Course added successfully', course: result.rows[0] });
             }
         });
@@ -37,8 +33,13 @@ const allCourses = async(req, res) => {
 const specificCourses = async(req, res) => {
     try {
         const { id } = req.params;
-        const users = await pool.query('SELECT * FROM courses WHERE id = $1', [id]);
-        res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
+        const users = await pool.query('SELECT * FROM courses WHERE authorId = $1', [id]);
+        if(users.rows.length > 0){
+            res.status(200).json({message: "Specific courses are returned", data: users.rows[0] });
+        }else{
+            res.status(201).json({message: "No course available"});
+        }
+        
     } catch (error) {
         return res.status(400).json({ message: 'Internal server error' });
     }
@@ -116,37 +117,7 @@ const statusCourses = async(req, res) => {
     }
 };
 
-// enroll courses 
-const enrollCourses = async(req, res) => {
- try {
-    const { studentId, studentName, studentEmail, courseId, courseTitle, coursePrice} = req.body;
-    const id = uuidv4();
-    console.log({ id, studentId, studentName, studentEmail, courseId, courseTitle, coursePrice });
-    
-    pool.query('INSERT INTO enroll (id, studentId, studentName, studentEmail, courseId, courseTitle, coursePrice) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [id, studentId, studentName, studentEmail, courseId, courseTitle, coursePrice],
-    (error, result) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            return res.status(201).json({ message: 'Enrollment failed' });
-        } else {
-            console.log('Inserted course:', result.rows[0]);
-            return res.status(200).json({ message: 'Enrollment successfully', course: result.rows[0] });
-        }
-    });
- } catch (error) {
-    res.status(400).json({ error: error.message }); 
- }
-};
 
-// get all enroll 
-const getEnroll = async(req, res) => {
-    try {
-        const users = await pool.query("SELECT * FROM enroll;")
-        res.status(200).json({message: "Enrolled students information returned", data: users.rows[0]});
-    } catch (error) {
-        return res.status(400).json({ message: 'Internal server error' });
-    }
-};
 
 
 
@@ -157,6 +128,5 @@ export {
     deleteCourses,
     editCourses,
     statusCourses,
-    enrollCourses,
-    getEnroll,
+
 };

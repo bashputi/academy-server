@@ -37,6 +37,7 @@ CREATE TABLE courses (
     studentlimit VARCHAR(30),
     author TEXT,
     image TEXT,
+    authorId VARCHAR(255),
     UNIQUE (id)
 );
 
@@ -49,8 +50,25 @@ CREATE TABLE enroll (
     courseId VARCHAR(200),
     courseTitle TEXT,
     coursePrice VARCHAR(30),
+    complete VARCHAR(20),
     UNIQUE (id)
 );
+
+CREATE TABLE wishlist (
+    id VARCHAR(255) PRIMARY KEY,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    courseId VARCHAR(200),
+    authorId VARCHAR(200),
+    authorName VARCHAR(200),
+    courseTitle TEXT,
+    category TEXT,
+    rating VARCHAR(20),
+    complete VARCHAR(20),
+    UNIQUE (id)
+);
+
+ALTER TABLE enroll
+ADD COLUMN complete VARCHAR(20);
 
 DELETE FROM student;
 
