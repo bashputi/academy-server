@@ -1,11 +1,10 @@
 import pool from "../db/db.js";
 import { v4 as uuidv4 } from 'uuid';
+import catchAsync from '../utils/catchAsync.js';
 
 
-
-// add to wishlist 
-const addWish = async(req, res) => {
- try {
+// create wishlist 
+const addWish = catchAsync(async(req, res) => {
     const { courseId, authorId, authorName, courseTitle, category, rating, complete} = req.body;
     const id = uuidv4();
     console.log({ id, courseId, authorId, authorName, courseTitle, category, rating, complete });
@@ -18,29 +17,17 @@ const addWish = async(req, res) => {
             return res.status(200).json({ message: 'Add to wishlist successfully', course: result.rows[0] });
         }
     });
- } catch (error) {
-    res.status(400).json({ error: error.message });
- }
-};
+});
 
 //get wishlist by author id
-const specificWishlist = async(req, res) => {
-    try {
-        const { id } = req.params;
-        const users = await pool.query('SELECT * FROM wishlist WHERE authorid = $1', [id]);
-        if(users.rows.length > 0){
-            res.status(200).json({message: "These are your wishlist courses.", data: users.rows[0] });
-        }else{
-            res.status(201).json({message: "No wishlist found" });
-        }
-    } catch (error) {
-        return res.status(400).json({ message: 'Internal server error' });  
-    }
-};
+const specificWishlist = catchAsync(async(req, res) => {
+    const { id } = req.params;
+    const users = await pool.query('SELECT * FROM wishlist WHERE id = $1', [id]);
+    res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
+});
 
 
 export {
-  
     addWish,
     specificWishlist,
 

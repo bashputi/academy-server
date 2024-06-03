@@ -3,13 +3,13 @@ import bcrypt from "bcrypt";
 import pool from "../db/db.js";
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
+import catchAsync from '../utils/catchAsync.js';
 
 
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
 
 // user register 
-const registerUser = async(req, res) => {
-    try {
+const registerUser = catchAsync(async(req, res) => {
         let {firstname, lastname, username, email, password, role} = req.body;
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
@@ -59,10 +59,8 @@ const registerUser = async(req, res) => {
                     )
                
                 }}  );
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
+   
+});
 
 // node mailer to send email 
 let transporter = nodemailer.createTransport({
@@ -83,8 +81,7 @@ const generateOTP = () => {
     return OTP;
 };
 //send OTP via Email
-const sendOTP = async (email, otp) => {
-    try {
+const sendOTP = catchAsync(async (email, otp) => {
         const mailOptions = {
             from: 'rimeislam672@gmail.com',
             to: email,
@@ -94,15 +91,10 @@ const sendOTP = async (email, otp) => {
         
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully')
-    } catch (error) {
-        console.error("Error sending email:", error);
-        throw error;
-    }
-};
+});
 
 // user login 
-const login = async(req, res) => {
-    try {
+const login = catchAsync(async(req, res) => {
         let {email, password} = req.body;
         console.log({email, password})
         pool.query(
@@ -148,15 +140,11 @@ const login = async(req, res) => {
                     return res.status(400).json({ status: 400, message: "Email or username does not exist" });
                 }
             }
-        );
-    } catch (error) {
-        res.status(400).json({ error: error.message });;
-    }  
-};
+        ); 
+});
 
 //Verify OTP
-const verifyOtp = async(req, res) => {
-    try {
+const verifyOtp = catchAsync(async(req, res) => {
         const { email, otp } = req.body;
         console.log({ email, otp } )
         pool.query("SELECT * FROM student WHERE email = $1 OR username = $1 AND otp = $2", [email, otp], async (err, results) => {
@@ -180,14 +168,10 @@ const verifyOtp = async(req, res) => {
               res.status(400).json({ status: 400, message: "OTP verification failed" });
             }
           });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
+});
 
 // google and facebook login 
-const socialLogin = async(req, res) => {
-    try {
+const socialLogin = catchAsync(async(req, res) => {
         let { firstname, lastname, username, email, password, role } = req.body;
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
@@ -248,32 +232,21 @@ const socialLogin = async(req, res) => {
                 }
             }
         );
-    } catch (error) {
-        res.status(400).json({ error: 'Server error occurred' });
-    }
-};
+});
 
-// get specific user information 
-const user = async(req, res) => {
-    try {
-        const { id } = req.params;
-        const users = await pool.query('SELECT * FROM student WHERE id = $1', [id]);
-        res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
-    } catch (error) {
-        res.json({error: error.message});
-    }
-};
+// get user by id
+const user = catchAsync(async(req, res) => {
+    const { id } = req.params;
+    const users = await pool.query('SELECT * FROM student WHERE id = $1', [id]);
+    res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
+});
 
-// get user information 
-const students = async(req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM student WHERE role = $1', ['student']);
-        console.log(result.rows)
-        res.json({ message: 'Students are returned', data: result.rows });
-      } catch (error) {
-        res.status(400).json({ error: error.message });
-      }
-};
+// get all user information 
+const students = catchAsync(async(req, res) => {
+    const result = await pool.query('SELECT * FROM student WHERE role = $1', ['student']);
+    console.log(result.rows)
+    res.json({ message: 'Students are returned', data: result.rows });
+});
 
 
 

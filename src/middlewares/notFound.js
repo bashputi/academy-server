@@ -4,3 +4,5 @@ const notFound = ( req, res, next) => {
         message: "Route not found"
       });
 }
+
+export default notFound;

@@ -99,8 +99,8 @@ CREATE TABLE blog (
 
 
 
-ALTER TABLE enroll
-ADD COLUMN complete VARCHAR(20);
+ALTER TABLE announcement
+ADD COLUMN status VARCHAR(20);
 
 DELETE FROM student;
 

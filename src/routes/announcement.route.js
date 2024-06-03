@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { addAnnouncement, announc } from "../controllers/announcement.controller.js";
+import { addAnnouncement, announc, specificAnnouncement } from "../controllers/announcement.controller.js";
 const router = Router();
 
 
  router.route("/announcement").post(addAnnouncement); 
- router.route("/wish/:course_name").get(announc); 
+ router.route("/announcement/:course_name").get(announc); 
+ router.route("/announcement/:id").get(specificAnnouncement); 
 
  
 
