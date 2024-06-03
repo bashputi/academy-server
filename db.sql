@@ -85,6 +85,18 @@ CREATE TABLE announcement (
     UNIQUE (id)
 );
 
+CREATE TABLE blog (
+    id VARCHAR(255) PRIMARY KEY,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    author_name Text,
+    Title TEXT,
+    category TEXT,
+    image TEXT,
+    description TEXT,
+    tags TEXT,
+    UNIQUE (id)
+);
+
 
 
 ALTER TABLE enroll

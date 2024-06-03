@@ -23,7 +23,7 @@ const addWish = async(req, res) => {
  }
 };
 
-//get wishlist for specific one
+//get wishlist by author id
 const specificWishlist = async(req, res) => {
     try {
         const { id } = req.params;

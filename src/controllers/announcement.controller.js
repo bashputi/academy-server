@@ -3,19 +3,19 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 
-// add to wishlist 
+// add to announcement
 const addAnnouncement = async(req, res) => {
  try { 
-    const { course_name, Title, summary, courseTitle, category, rating, complete} = req.body;
+    const { course_name, summary, Title} = req.body;
     const id = uuidv4();
-    console.log({ id, courseId, authorId, authorName, courseTitle, category, rating, complete });
+    console.log({ id,course_name, summary, Title });
     
-    pool.query('INSERT INTO wishlist (id, courseId, authorId, authorName, courseTitle, category, rating, complete) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [id, courseId, authorId, authorName, courseTitle, category, rating, complete],
+    pool.query('INSERT INTO announcement (id, course_name, summary, Title) VALUES ($1, $2, $3, $4) RETURNING *', [id, course_name, summary, Title],
     (error, result) => {
         if (error) {
-            return res.status(201).json({ message: 'Add to wishlist failed' });
+            return res.status(201).json({ message: 'Announcement failed' });
         } else {
-            return res.status(200).json({ message: 'Add to wishlist successfully', course: result.rows[0] });
+            return res.status(200).json({ message: 'Announcement added successfully', course: result.rows[0] });
         }
     });
  } catch (error) {
@@ -23,15 +23,15 @@ const addAnnouncement = async(req, res) => {
  }
 };
 
-//get wishlist for specific one
-const specificWishlist = async(req, res) => {
+//get announcement by course name
+const announc = async(req, res) => {
     try {
-        const { id } = req.params;
-        const users = await pool.query('SELECT * FROM wishlist WHERE authorid = $1', [id]);
+        const { course_name } = req.params;
+        const users = await pool.query('SELECT * FROM announcement WHERE course_name = $1', [course_name]);
         if(users.rows.length > 0){
-            res.status(200).json({message: "These are your wishlist courses.", data: users.rows[0] });
+            res.status(200).json({message: "These are your announcement.", data: users.rows[0] });
         }else{
-            res.status(201).json({message: "No wishlist found" });
+            res.status(201).json({message: "No announcement found" });
         }
     } catch (error) {
         return res.status(400).json({ message: 'Internal server error' });  
@@ -42,6 +42,6 @@ const specificWishlist = async(req, res) => {
 export {
   
     addAnnouncement,
-    specificWishlist,
+    announc,
 
 };
