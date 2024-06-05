@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { ApiResponse } from "./apiResponse.js";
+import { ApiErrors } from "./apiError.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -13,24 +15,101 @@ export const transporter = nodemailer.createTransport({
 });
 
 // Generic function to send email
-export const email = (mailOptions) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error sending email:', error);
-        } else {
-            console.log('Email sent:', info.response);
-        }
-    });
+export const sendEmail = async (mailOptions) => {
+  try {
+      const info = await transporter.sendMail(mailOptions);
+      return new ApiResponse(200, info.response, 'Email sent successfully');
+  } catch (error) {
+      throw new ApiErrors(500, 'Error sending email');
+  }
+};
+
+
+// send otp to the user 
+export const sendOTP = (email, otp, name) => {
+
+  const mailOptions = {
+    from: `"SOLAR ACADEMY" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Your OTP for Verification',
+    text: `
+    Dear ${name},
+    
+    Your OTP for verification is: ${otp}
+    
+    Please use this OTP to complete your verification process.
+    
+    Best regards,
+    Solar Academy Team
+    `,
+    html: `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h1 style="color: #4CAF50;">OTP Verification from Solar Academy</h1>
+        <p>Dear ${name},</p>
+        <p>Your OTP for verification is:</p>
+        <div style="font-size: 1.2em; color: #4CAF50; font-weight: bold;">${otp}</div>
+        <p>Please use this OTP to complete your verification process.</p>
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+        <p style="font-size: 0.9em; color: #777;">
+            Best regards,<br>
+            Solar Academy Team
+        </p>
+    </div> `
+  };
+   transporter.sendMail(mailOptions);
+
 };
 
 // Confirmation Email Template
-export const contactUsEmail = (orderDetails) => {
-    const { to, name, email: senderEmail, text, title } = orderDetails;
+export const resetPassword = (email, url, name) => {
+
+  const mailOptions = {
+      from: `"SOLAR ACADEMY" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Password Reset Request',
+      text: `
+      Dear ${name},
+
+      We received a request to reset the password for your Solar Academy account. To complete the process, please click on the link below within the next 10 minutes:
+
+      ${url}
+
+      If you did not request a password reset, please disregard this email. Your password will remain unchanged.
+
+      For your security, please do not share this link with anyone.
+
+      Best regards,
+      Solar Academy Team
+            `,
+            html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <p>Dear ${name},</p>
+                <p>We received a request to reset the password for your Solar Academy account. To complete the process, please click on the link below within the next <span style="font-weight: bold; color: #e74c3c;">10 minutes </span>:</p>
+                <p> <a href="${url}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #ffffff; background-color: #1a73e8; text-decoration: none; border-radius: 5px;">
+                Reset your password
+                </a></p>
+                <p>If you did not request a password reset, please disregard this email. Your password will remain unchanged.</p>
+                <p>For your security, please do not share this link with anyone.</p>
+                <p style="font-size: 0.9em; color: #777;">
+                    Best regards,<br>
+                    Solar Academy Team
+                </p>
+            </div>
+            `
+  };
+  sendEmail(mailOptions);
+
+};
+
+
+// Confirmation Email Template
+export const contactUsEmail = (userdetails) => {
+    const { to, name, email: senderEmail, text, title } = userdetails;
 
     const mailOptions = {
         from: `"SOLAR ACADEMY" <${process.env.EMAIL_USER}>`,
         to,
-        subject: 'Order Confirmation - Thank You for Shopping with Us!',
+        subject: 'Contact us section mail!',
         text:`
         New Form Submission from Solar Academy
     
@@ -73,5 +152,5 @@ export const contactUsEmail = (orderDetails) => {
         </div>
       `
     };
-    email(mailOptions);
+    transporter.sendMail(mailOptions);
 };

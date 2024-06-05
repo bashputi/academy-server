@@ -6,7 +6,7 @@ import catchAsync from '../utils/catchAsync.js';
 const sendEmail = catchAsync(async (req, res) => {
     const { name, email, text, title } = req.body;
     const userData = {
-        to: email,
+        to: 'rimuislam36@gmail.com',
         name: name,
         text: text,
         title: title,

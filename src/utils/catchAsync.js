@@ -1,10 +1,7 @@
-
- const catchAsync =( requestHandler ) => async (req, res, next) => {
-    try {
-        return await requestHandler(req, res, next)
-    } catch (error) {
-        next(error)
-    }
+const catchAsync = fn => {
+    return function(req, res, next) {
+        fn(req, res, next).catch(next);
+    };
 };
 
 export default catchAsync;
