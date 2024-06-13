@@ -56,7 +56,7 @@ export const sendOTP = (email, otp, name) => {
         </p>
     </div> `
   };
-   transporter.sendMail(mailOptions);
+  sendEmail(mailOptions);
 
 };
 
@@ -152,5 +152,5 @@ export const contactUsEmail = (userdetails) => {
         </div>
       `
     };
-    transporter.sendMail(mailOptions);
+    sendEmail(mailOptions);
 };

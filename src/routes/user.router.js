@@ -5,6 +5,8 @@ import { registerUser, login, verifyOtp,
 
  } from "../controllers/user.controller.js";
 const router = Router();
+import {verifyAuth} from "../middlewares/auth.middleware.js"
+import {verifyAdmin} from "../middlewares/auth.middleware.js"
 
 
 
@@ -14,8 +16,8 @@ const router = Router();
  router.route("/social-login").post(socialLogin);
  router.route("/forget-password").get(forgetPassword);
  router.route("/change-password").patch(changePassword);
- router.route("/students").get(students);
- router.route("/:id").get(user);
+ router.route("/students").get(verifyAuth, students);
+ router.route("/:id").get(verifyAuth, user);
 
 
 

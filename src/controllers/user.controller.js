@@ -1,12 +1,14 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import pool from "../db/db.js";
 import { v4 as uuidv4 } from 'uuid';
 import catchAsync from '../utils/catchAsync.js';
 import { sendOTP } from "../utils/email.js";
 import { resetPassword } from "../utils/email.js";
+import { ApiResponse } from "../utils/apiResponse.js";
+import { ApiErrors } from "../utils//apiError.js";
 
-const secretKey = process.env.ACCESS_TOKEN_SECRET;
+export const secretKey = process.env.ACCESS_TOKEN_SECRET;
 
 // user register 
 const registerUser = catchAsync(async(req, res) => {
@@ -20,11 +22,7 @@ const registerUser = catchAsync(async(req, res) => {
                     throw err;
                 }
                 if(results.rows.length > 0){
-                    res.status(400).json({
-                        status: 400,
-                        message: "Email already used!!",
-                      });
-                      return;
+                    throw new ApiErrors(400, "Email already used!!");
                 }else{
                     pool.query(
                         `SELECT * FROM student WHERE username = $1`, [username],
@@ -33,11 +31,7 @@ const registerUser = catchAsync(async(req, res) => {
                                 throw err;
                             }
                             if(results.rows.length > 0){
-                                res.status(400).json({
-                                    status: 400,
-                                    message: "User Name already used!!",
-                                });
-                                return;
+                                throw new ApiErrors(400, "User Name already used!!");
                             }else{
                                 pool.query(
                                     `INSERT INTO student (id, firstname, lastname, username, email, password, role)
@@ -48,11 +42,9 @@ const registerUser = catchAsync(async(req, res) => {
                                             throw err;
                                         }
                                         if(results.rows.length > 0){
-                                            res.status(200).json({
-                                                status: 201,
-                                                success: true,
-                                                message: "User Created Successfully",
-                                              });
+                                            return res.status(200).json(
+                                                new ApiResponse(200, { results }, "User registered Successfully")
+                                            ) 
                                         } }) 
                             }
                         }
@@ -90,7 +82,7 @@ const login = catchAsync(async (req, res) => {
                 bcrypt.compare(password, user.password, async (err, isMatch) => {
                     if (err) {
                         console.log("Error comparing passwords:", err);
-                        return res.status(400).json({ status: 400, message: "Server error" });
+                        throw new ApiErrors(500, "Server error");
                     }
                     if (isMatch) {
                         const otp = generateOTP();
@@ -104,20 +96,17 @@ const login = catchAsync(async (req, res) => {
                             values: [otp, user.email],
                         };
                         const result = await pool.query(updateQuery);
+                  
                         if (result.rows.length > 0) {
                             await sendOTP(email, otp, name);
-                            return res.status(200).json({
-                                status: 200,
-                                success: true,
-                                message: "Verify OTP for Verification",
-                            });
+                            return res.status(200).json(new ApiResponse(200, user, "Verify OTP for Verification"));
                         }
                     } else {
-                        return res.status(400).json({ status: 400, message: "Password is incorrect" });
+                        throw new ApiErrors(400, "Password is incorrect");
                     }
                 });
             } else {
-                return res.status(400).json({ status: 400, message: "Email or username does not exist" });
+                throw new ApiErrors(404, "Email or username does not exist");
             }
         }
     );

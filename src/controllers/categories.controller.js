@@ -24,10 +24,31 @@ const allCourses = catchAsync(async(req, res) => {
         res.status(200).json({message: "CAtegories are returned", data: users.rows});
 });
 
+// edit categories
+const editCourses = catchAsync(async(req, res) => {
+        const users = await pool.query("SELECT * FROM categories;")
+        res.status(200).json({message: "Categories are returned", data: users.rows});
+});
+
+// delete categories
+const deleteCourses = catchAsync(async(req, res) => {
+    const { id } = req.params;
+    const deleteQuery = 'DELETE FROM categories WHERE id = $1';
+    const result = await pool.query(deleteQuery, [id]);
+  
+    if (result.rowCount === 0) {
+        return res.status(404).json({ message: 'No categories found' });
+    }
+    res.status(200).json({ message: 'Categories deleted successfully.' });
+});
+
 
 
 export {
     addcategory,
     allCourses,
+    editCourses,
+    deleteCourses,
+
 
 };

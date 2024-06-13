@@ -49,3 +49,5 @@ app.use(globalErrorHandler);
 
 // Not Found route
 app.use(notFound);
+
+// api error handler 
