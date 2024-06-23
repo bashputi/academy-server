@@ -64,7 +64,7 @@ export const sendOTP = (email, otp, name) => {
 export const resetPassword = (email, url, name) => {
 
   const mailOptions = {
-      from: `"SOLAR ACADEMY" <${process.env.EMAIL_USER}>`,
+      from: `<${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Password Reset Request',
       text: `

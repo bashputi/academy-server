@@ -14,9 +14,9 @@ import {verifyAdmin} from "../middlewares/auth.middleware.js"
  router.route("/login").patch(login);
  router.route("/verify-otp").post(verifyOtp);
  router.route("/social-login").post(socialLogin);
- router.route("/forget-password").get(forgetPassword);
+ router.route("/forget-password").post(forgetPassword);
  router.route("/change-password").patch(changePassword);
- router.route("/students").get(verifyAuth, students);
+ router.route("/students").get( students);
  router.route("/:id").get(verifyAuth, user);
 
 

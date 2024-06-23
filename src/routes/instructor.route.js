@@ -5,8 +5,8 @@ import {verifyAuth} from "../middlewares/auth.middleware.js"
 import {verifyInstructor} from "../middlewares/auth.middleware.js"
 
  router.route("/:id").patch(verifyAuth, appication);
- router.route("/instructor/appicator").get(verifyAuth, instructor);
- router.route("/instructorRequest/:id").patch(verifyAuth, instructorRequest);
+ router.route("/instructors").get( instructor);
+ router.route("/instructorRequest/:id").patch( instructorRequest);
 
 
 

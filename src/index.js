@@ -24,7 +24,7 @@ app.use(cors());
 app.use("/api/user", userRouter)
 app.use("/api/user", settingRouter)
 app.use("/api/admin", coursesRoute)
-app.use("/api/instructor", instructorRoute)
+app.use("/api/admin", instructorRoute)
 app.use("/api/student", enrollRoute)
 app.use("/api/student", wishlistRoute)
 app.use("/api/admin", categoriesRoute)

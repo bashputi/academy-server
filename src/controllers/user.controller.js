@@ -216,7 +216,7 @@ const forgetPassword = catchAsync(async(req, res) => {
                 const name = user.firstname + ' ' + user.lastname;
                 const email = user.email;
 
-                const token = jwt.sign({email: user. email} , secretKey, { expiresIn: '1day' });
+                const token = jwt.sign({email: user.email} , secretKey, { expiresIn: '1day' });
                 const url = `http://localhost:5173/reset-password/${id}/${token}`
 
                await resetPassword(email, url, name);
@@ -260,11 +260,38 @@ const user = catchAsync(async(req, res) => {
     res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
 });
 
-// get all user information 
-const students = catchAsync(async(req, res) => {
-    const result = await pool.query('SELECT * FROM student WHERE role = $1', ['student']);
-    console.log(result.rows)
-    res.json({ message: 'Students are returned', data: result.rows });
+// get all student information 
+const students = catchAsync(async (req, res) => {
+    const page = Number(req.query.page) || 1;
+    const limit = 12;
+    const offset = (page - 1) * limit;
+
+    try {
+        const query = `
+            SELECT *
+            FROM student
+            WHERE role = $1
+            LIMIT $2 OFFSET $3
+        `;
+
+        const result = await pool.query(query, ['student', limit, offset]);
+        const students = result.rows;
+
+        if (students.length === 0) {
+            throw new ApiErrors(404, "Students not found");
+        }
+
+        const data = {
+            students,
+            currentPage: page,
+            totalPages: Math.ceil(students.length / limit) 
+        };
+
+        return res.status(200).json(new ApiResponse(200, data, "Students retrieved successfully"));
+    } catch (error) {
+        console.error("Error retrieving students:", error.message);
+        return res.status(500).json({ message: "Error retrieving students", error: error.message });
+    }
 });
 
 

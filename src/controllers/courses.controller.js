@@ -1,6 +1,8 @@
 import pool from "../db/db.js";
 import { v4 as uuidv4 } from 'uuid';
 import catchAsync from '../utils/catchAsync.js';
+import { ApiErrors } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 
 // create course 
@@ -18,9 +20,79 @@ const course = catchAsync(async(req, res) => {
 });
 
 // get all courses 
-const allCourses = catchAsync(async(req, res) => {
-        const users = await pool.query("SELECT * FROM courses;")
-        res.status(200).json({message: "Course are returned", data: users.rows});
+const allCourses = catchAsync(async (req, res) => {
+    const { status, category, date, search } = req.body;
+    const sortBy = req.body.sortBy || 'date';
+    const sortOrder = req.body.sortOrder || 'ASC';
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 12;
+    const offset = (page - 1) * limit;
+
+    let filters = [];
+    let values = [];
+    let query = "SELECT * FROM courses";
+    let countQuery = "SELECT COUNT(*) AS total FROM courses";
+
+    // Add filters
+    if (status) {
+        filters.push(`status = $${filters.length + 1}`);
+        values.push(status);
+    }
+    if (category) {
+        filters.push(`categories = $${filters.length + 1}`);
+        values.push(category);
+    }
+    if (date) {
+        filters.push(`DATE(date) = $${filters.length + 1}`);
+        values.push(date);
+    }
+    if (search) {
+        filters.push(`(
+            categories ILIKE $${filters.length + 1} OR 
+            title ILIKE $${filters.length + 1}
+        )`);
+        values.push(`%${search}%`);
+    }
+
+    // Add WHERE clause if there are filters
+    if (filters.length > 0) {
+        const whereClause = filters.join(' AND ');
+        query += ` WHERE ${whereClause}`;
+        countQuery += ` WHERE ${whereClause}`;
+    }
+
+    // Add sorting
+    query += ` ORDER BY ${sortBy} ${sortOrder}`;
+
+    // Add pagination
+    query += ` LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+    values.push(limit, offset);
+
+    try {
+        // Execute the query to fetch courses
+        const result = await pool.query(query, values);
+        const courses = result.rows;
+  
+        // Execute the count query to get total count of courses
+        const countResult = await pool.query(countQuery, values.slice(0, filters.length));
+        const totalCourses = parseInt(countResult.rows[0].total, 10);
+
+        if (courses.length === 0 && totalCourses === 0) {
+            throw new ApiErrors(404, "Courses not found");
+        }
+
+        const data = {
+            totalCourses,
+            courses,
+            currentPage: page,
+            totalPages: Math.ceil(totalCourses / limit)
+        };
+
+        return res.status(200).json(new ApiResponse(200, data, "Courses retrieved successfully"));
+    } catch (error) {
+        console.error("Error retrieving courses:", error.message);
+        return res.status(500).json({ message: "Error retrieving courses", error: error.message });
+    }
 });
 
 // get specific courses by id
@@ -71,7 +143,7 @@ const editCourses = catchAsync(async(req, res) => {
        if (result.rowCount === 0) {
            return res.status(404).json({ error: "Course not found" });
        }
-       res.status(200).json({ message: 'Course deleted successfully.', data: result.rows[0]});
+       res.status(200).json({ message: 'Course edited successfully.', data: result.rows[0]});
 });
 
 // change publish status 

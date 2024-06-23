@@ -6,7 +6,7 @@ CREATE TABLE student (
     lastname VARCHAR(100),
     username VARCHAR(100) UNIQUE,
     password VARCHAR(200),
-     email VARCHAR(200) UNIQUE,
+    email VARCHAR(200) UNIQUE,
     role VARCHAR(50),
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     otp VARCHAR(10),

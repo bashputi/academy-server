@@ -12,6 +12,8 @@ const enrollCourses = catchAsync(async(req, res) => {
            if (error) {
                return res.status(201).json({ message: 'Enrollment failed' });
            } else {
+
+            
                return res.status(200).json({ message: 'Enrollment successfully', course: result.rows[0] });
            }
        });

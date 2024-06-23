@@ -13,11 +13,9 @@ export const verifyAuth = catchAsync(async (req, _, next) => {
     }
     try {
       const decodeToken = await jwt.verify(token, secretKey);
-      console.log(decodeToken);
   
       const result = await pool.query(`SELECT * FROM student WHERE email = $1`, [decodeToken.email]);
       const user = result.rows[0];
-      console.log(user);
   
       if (!user) {
         throw new ApiErrors(401, "Invalid Access Token");
@@ -26,7 +24,7 @@ export const verifyAuth = catchAsync(async (req, _, next) => {
       req.user = user;
   
     } catch (error) {
-      console.error(error); // Log the actual error for debugging
+      console.error(error); 
       throw new ApiErrors(401, "Invalid Access Token");
     }
   
