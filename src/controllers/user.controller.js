@@ -1,57 +1,51 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import pool from "../db/db.js";
-import { v4 as uuidv4 } from 'uuid';
 import catchAsync from '../utils/catchAsync.js';
 import { sendOTP } from "../utils/email.js";
 import { resetPassword } from "../utils/email.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiErrors } from "../utils//apiError.js";
+import prisma from "../db/db.config.js";
 
 export const secretKey = process.env.ACCESS_TOKEN_SECRET;
+const URL = process.env.FRONTEND_URL;
 
 // user register 
-const registerUser = catchAsync(async(req, res) => {
-        let {firstname, lastname, username, email, password, role} = req.body;
-        const id = uuidv4();
-        let hashedPassword = await bcrypt.hash(password, 10);
-        pool.query(
-            `SELECT * FROM student WHERE email = $1`, [email],
-            (err, results) => {
-                if(err){
-                    throw err;
-                }
-                if(results.rows.length > 0){
-                    throw new ApiErrors(400, "Email already used!!");
-                }else{
-                    pool.query(
-                        `SELECT * FROM student WHERE username = $1`, [username],
-                        (err, results) => {
-                            if(err){
-                                throw err;
-                            }
-                            if(results.rows.length > 0){
-                                throw new ApiErrors(400, "User Name already used!!");
-                            }else{
-                                pool.query(
-                                    `INSERT INTO student (id, firstname, lastname, username, email, password, role)
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7)
-                                    returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
-                                    (err, results) => {
-                                        if (err){
-                                            throw err;
-                                        }
-                                        if(results.rows.length > 0){
-                                            return res.status(200).json(
-                                                new ApiResponse(200, { results }, "User registered Successfully")
-                                            ) 
-                                        } }) 
-                            }
-                        }
-                    )
-               
-                }}  );
-   
+const registerUser = catchAsync(async (req, res) => {
+    let { firstname, lastname, username, email, password, role } = req.body;
+    
+    // Check if email is already used
+    const existingUserByEmail = await prisma.user.findUnique({
+        where: { email },
+    });
+    if (existingUserByEmail) {
+        throw new ApiErrors(400, "Email already used!!");
+    }
+
+    // Check if username is already used
+    const existingUserByUsername = await prisma.user.findUnique({
+        where: { username },
+    });
+    if (existingUserByUsername) {
+        throw new ApiErrors(400, "User Name already used!!");
+    }
+
+    // Hash the password
+    let hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = await prisma.user.create({
+        data: {
+            firstname,
+            lastname,
+            username,
+            email,
+            password: hashedPassword,
+            role,
+        },
+    });
+
+    return res.status(200).json(new ApiResponse(200, { newUser }, "User registered Successfully"));
 });
 
 //Generate OTP
@@ -66,198 +60,184 @@ const generateOTP = () => {
 
 // user login 
 const login = catchAsync(async (req, res) => {
-    let { email, password } = req.body;
-    pool.query(
-        `SELECT * FROM student WHERE email = $1 OR username = $1`,
-        [email],
-        async (err, results) => {
-            if (err) {
-                throw err;
-            }
-            if (results.rows.length > 0) {
-                const user = results.rows[0];
-                const email = results.rows[0].email;
-                const name = results.rows[0].username
+    let { userData, password } = req.body;
 
-                bcrypt.compare(password, user.password, async (err, isMatch) => {
-                    if (err) {
-                        console.log("Error comparing passwords:", err);
-                        throw new ApiErrors(500, "Server error");
-                    }
-                    if (isMatch) {
-                        const otp = generateOTP();
-                        console.log(otp);
-
-                        const updateQuery = {
-                            text: `UPDATE student 
-                                   SET otp = $1
-                                   WHERE email = $2
-                                   RETURNING *`,
-                            values: [otp, user.email],
-                        };
-                        const result = await pool.query(updateQuery);
-                  
-                        if (result.rows.length > 0) {
-                            await sendOTP(email, otp, name);
-                            return res.status(200).json(new ApiResponse(200, user, "Verify OTP for Verification"));
-                        }
-                    } else {
-                        throw new ApiErrors(400, "Password is incorrect");
-                    }
-                });
-            } else {
-                throw new ApiErrors(404, "Email or username does not exist");
-            }
+    // Find user by email or username
+    const user = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: userData },
+                { username: userData }
+            ]
         }
-    );
+    });
+
+    if (!user) {
+        throw new ApiErrors(404, "Email or username does not exist");
+    }
+
+    // Compare passwords
+    const isMatch = bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        throw new ApiErrors(400, "Password is incorrect");
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    console.log(otp);
+
+    // Update user with OTP
+    const updatedUser = await prisma.user.update({
+        where: { email: user.email },
+        data: { otp: otp }
+    });
+
+    // Send OTP to user's email
+    sendOTP(user.email, otp, user.username);
+
+    return res.status(200).json(new ApiResponse(200, updatedUser, "Verify OTP for Verification"));
 });
 
 //Verify OTP
-const verifyOtp = catchAsync(async(req, res) => {
-        const { user, otp } = req.body;
-        console.log({ user, otp } )
-        pool.query("SELECT * FROM student WHERE email = $1 OR username = $1 AND otp = $2", [user, otp], async (err, results) => {
-            if (err) {
-              throw err;
-            }
-            if (results.rows.length > 0) {
-              const user = results.rows[0];
+const verifyOtp = catchAsync(async (req, res) => {
+    const { userData, otp } = req.body;
+    console.log({ userData, otp });
 
-              const token = jwt.sign({
-                username: user.username,
-                 email: user. email,
-                 role: user.role,
-              } , secretKey, { expiresIn: '30day' });
+    // Find user by email or username and OTP
+    const foundUser = await prisma.user.findFirst({
+        where: {
+            AND: [
+                {
+                    OR: [
+                        { email: userData },
+                        { username: userData }
+                    ]
+                },
+                { otp: otp }
+            ]
+        }
+    });
 
-              res.status(200).json({ token, success: true, message: "Logged in Successfully" });
-            } else {
-              res.status(400).json({ status: 400, message: "OTP verification failed" });
-            }
-          });
+    if (foundUser) {
+        // Create JWT token
+        const token = jwt.sign({
+            username: foundUser.username,
+            email: foundUser.email,
+            role: foundUser.role,
+        }, secretKey, { expiresIn: '30d' });
+
+        return res.status(200).json(new ApiResponse(200, { token }, "Logged in Successfully"));
+    } else {
+        throw new ApiErrors(400, "OTP verification failed");
+    }
 });
 
 // google and facebook login 
-const socialLogin = catchAsync(async(req, res) => {
-        let { firstname, lastname, username, email, password, role } = req.body;
-        const id = uuidv4();
-        let hashedPassword = await bcrypt.hash(password, 10);
-       
-        pool.query(
-            `SELECT * FROM student
-            WHERE email = $1`,
-            [email],
-            (err, results) => {
-                if (err) {
-                    console.log('server error', err);
-                    return res.status(400).json({ error: 'Server error occurred' });
-                }
-                if (results && results.rows.length > 0) {
-                    const user = results.rows[0];
-                    bcrypt.compare(password, user.password, async(err, isMatch) => {
-                        if (err) {
-                            console.log("Error comparing password", err);
-                            return res.status(400).json({ error: 'Server error occurred' });
-                        }
-                        if (isMatch) {
-                      res.status(200).json({
-                        status: 200,
-                        success: true,
-                        message: "Verified user",
-                      });
-                      return 
-                      }
-                        else {
-                            return res.status(400).json({
-                                status: 400,
-                                message: "Email already used!!",
-                            });
-                        }
-                    });
-                } else {
-                    pool.query(
-                        `INSERT INTO student (id, firstname, lastname, username, email, password, role)
-                        VALUES ($1, $2, $3, $4, $5, $6, $7)
-                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
-                        async(err, results) => {
-                            if (err) {
-                                console.log("Error inserting user", err);
-                                return res.status(500).json({ error: 'Server error occurred' });
-                            }
-                            if (results.rows.length > 0) {
-                                const user = results.rows[0];
-                  
-                               res.status(200).json({
-                                    status: 200,
-                                    success: true,
-                                    message: "Create user",
-                                  });
-                                  return 
-                            }
-                        }
-                    );
-                }
-            }
-        );
+const socialLogin = catchAsync(async (req, res) => {
+    let { firstname, lastname, username, email, password, role } = req.body;
+    let hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if email already exists
+    const existingUser = await prisma.user.findUnique({
+        where: { email },
+    });
+
+    if (existingUser) {
+        // Compare passwords if user exists
+        const isMatch = bcrypt.compare(password, existingUser.password);
+
+        if (isMatch) {
+            return res.status(200).json(new ApiResponse(200, existingUser, "User log in successfull"));
+        } else {
+            throw new ApiErrors(400, "Email already used!!");
+        }
+    } else {
+        // Create new user if email doesn't exist
+        const newUser = await prisma.user.create({
+            data: {
+                firstname,
+                lastname,
+                username,
+                email,
+                password: hashedPassword,
+                role,
+            },
+        });
+        return res.status(200).json(new ApiResponse(200, newUser, "User created successfully"));
+    }
 });
 
 // send email for forget password
-const forgetPassword = catchAsync(async(req, res) => {
-    const { user } = req.body;
+const forgetPassword = catchAsync(async (req, res) => {
+    const {userData} = req.body;
 
-    pool.query(`SELECT * FROM student WHERE email = $1 OR username = $1`,
-        [user],
-        async (err, results) => {
-            if (err) {
-                throw err;
-            }
-            if (results.rows.length > 0) {
-                const user = results.rows[0];
-                const id = user.id;
-                const name = user.firstname + ' ' + user.lastname;
-                const email = user.email;
+    // Find user by email or username
+    const foundUser = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: userData},
+                { username: userData}
+            ]
+        }
+    });
 
-                const token = jwt.sign({email: user.email} , secretKey, { expiresIn: '1day' });
-                const url = `http://localhost:5173/reset-password/${id}/${token}`
+    if (!foundUser) {
+        throw new ApiErrors(404, "User not found");
+    }
 
-               await resetPassword(email, url, name);
-               return res.status(200).json({
-                status: 200,
-                success: true,
-                message: "Password reset email sent successfully.",
-            });
+    const id = foundUser.id;
+    const name = `${foundUser.firstname} ${foundUser.lastname}`;
+    const email = foundUser.email;
 
-            }else {
-               return res.status(404).json({message: "User not found"});
-            }
-        })
+    const token = jwt.sign({ email: foundUser.email }, secretKey, { expiresIn: '1d' });
+    const url = `${URL}/pages/User/forget_password/${id}/${token}`;
+
+    // Send reset password email
+     resetPassword(email, url, name);
+
+    return res.status(200).json(new ApiResponse(200, null, "Password reset email sent successfully."));
 });
 
 // send email for forget password
-const changePassword = catchAsync(async(req, res) => {
+const changePassword = catchAsync(async (req, res) => {
     const { id, token, password } = req.body;
 
-    jwt.verify(token, secretKey, async(err, decoded) => {
-        if(err) {
-            return res.json({status: 400, message: "Invalid user"})
+    jwt.verify(token, secretKey, async (err, decoded) => {
+        if (err) {
+            throw new ApiErrors(400, "Invalid token");
         } else {
             let hashedPassword = await bcrypt.hash(password, 10);
             if (hashedPassword) {
-                await pool.query(`UPDATE student SET password = $1 WHERE id = $2`, [hashedPassword, id]);
-                res.status(200).json({ message: 'Password updated successfully' });
-            } else {
-                res.status(400).json({ message: 'Password updated faild' });
-            }
+                const updatedUser = await prisma.user.update({
+                    where: { id: id },
+                    data: { password: hashedPassword },
+                });
 
+                if (updatedUser) {
+                    return res.status(200).json(new ApiResponse(200, null, 'Password updated successfully'));
+                } else {
+                    throw new ApiErrors(400, 'Password update failed');
+                }
+            } else {
+                throw new ApiErrors(400, 'Password hashing failed');
+            }
         }
-    })
- 
+    });
 });
 
 // get user by id
-const user = catchAsync(async(req, res) => {
+const user = catchAsync(async (req, res) => {
     const { id } = req.params;
-    const users = await pool.query('SELECT * FROM student WHERE id = $1', [id]);
-    res.status(200).json({message: "Specific user is returned", data: users.rows[0] });
+
+    const foundUser = await prisma.user.findUnique({
+        where: { id: id },
+    });
+
+    if (!foundUser) {
+        throw new ApiErrors(404, "User not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, foundUser, "Specific user is returned"));
 });
 
 // get all student information 
@@ -267,33 +247,32 @@ const students = catchAsync(async (req, res) => {
     const offset = (page - 1) * limit;
 
     try {
-        const query = `
-            SELECT *
-            FROM student
-            WHERE role = $1
-            LIMIT $2 OFFSET $3
-        `;
-
-        const result = await pool.query(query, ['student', limit, offset]);
-        const students = result.rows;
+        const students = await prisma.user.findMany({
+            where: { role: 'student' },
+            take: limit,
+            skip: offset,
+        });
 
         if (students.length === 0) {
             throw new ApiErrors(404, "Students not found");
         }
 
+        const totalStudents = await prisma.user.count({
+            where: { role: 'student' }
+        });
+
         const data = {
             students,
             currentPage: page,
-            totalPages: Math.ceil(students.length / limit) 
+            totalPages: Math.ceil(totalStudents / limit),
         };
 
         return res.status(200).json(new ApiResponse(200, data, "Students retrieved successfully"));
     } catch (error) {
         console.error("Error retrieving students:", error.message);
-        return res.status(500).json({ message: "Error retrieving students", error: error.message });
+        throw new ApiErrors(500, "Error retrieving students");
     }
 });
-
 
 
 

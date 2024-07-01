@@ -60,7 +60,7 @@ export const sendOTP = (email, otp, name) => {
 
 };
 
-// Confirmation Email Template
+//reset password Email Template
 export const resetPassword = (email, url, name) => {
 
   const mailOptions = {
@@ -102,7 +102,7 @@ export const resetPassword = (email, url, name) => {
 };
 
 
-// Confirmation Email Template
+// Contact us Email Template
 export const contactUsEmail = (userdetails) => {
     const { to, name, email: senderEmail, text, title } = userdetails;
 

@@ -2,34 +2,36 @@ import jwt from "jsonwebtoken";
 import catchAsync from '../utils/catchAsync.js';
 import { secretKey } from "../controllers/user.controller.js"
 import { ApiErrors } from "../utils/apiError.js"
-import pool from "../db/db.js";
+import prisma from "../db/db.config.js";
 
 
 
 export const verifyAuth = catchAsync(async (req, _, next) => {
-    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) {
+  const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
       throw new ApiErrors(400, "Token is missing");
-    }
-    try {
+  }
+
+  try {
       const decodeToken = await jwt.verify(token, secretKey);
-  
-      const result = await pool.query(`SELECT * FROM student WHERE email = $1`, [decodeToken.email]);
-      const user = result.rows[0];
-  
+
+      const user = await prisma.user.findUnique({
+          where: { email: decodeToken.email },
+      });
+
       if (!user) {
-        throw new ApiErrors(401, "Invalid Access Token");
+          throw new ApiErrors(401, "Invalid Access Token");
       }
-  
+
       req.user = user;
-  
-    } catch (error) {
-      console.error(error); 
+  } catch (error) {
+      console.error(error);
       throw new ApiErrors(401, "Invalid Access Token");
-    }
-  
-    next();
-  });
+  }
+
+  next();
+});
 
 export const verifyInstructor = catchAsync(async(req, res, next)=>{
 

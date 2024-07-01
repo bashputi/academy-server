@@ -8,9 +8,9 @@ import {verifyInstructor} from "../middlewares/auth.middleware.js"
 
 
 
- router.route("/enroll").post(verifyAuth, enrollCourses); 
- router.route("/get/enroll").get(verifyAuth, getEnroll); 
- router.route("/specific_enrollment/:id").get(verifyAuth, specificEnrollment); 
+ router.route("/enroll").post( enrollCourses); 
+ router.route("/get/enroll").get( getEnroll); 
+ router.route("/specific_enrollment/:id").get( specificEnrollment); 
 
 
 

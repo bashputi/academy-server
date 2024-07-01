@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String       @id @default(cuid())
+  firstname     String
+  lastname      String
+  username      String       @unique
+  password      String?
+  email         String       @unique
+  role          String
+  date          DateTime     @default(now())
+  otp           String?
+  skill         String?
+  phone         String?  
+  profileimage  String?
+  coverimage    String?
+  facebook      String?
+  twitter       String?
+  linkedin      String?
+  website       String?
+  github        String?
+  bio           String?
+
+  enrollments   Enrollment[]  
+  courses       Course[]      @relation("CourseAuthor") 
+  wishlist      Wishlist[]    
+  Category      Category[]    
+}
+
+model Course {
+  id              String       @id @default(cuid())
+  title           String
+  description     String
+  content         String
+  authorId        String      
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+
+  author          User         @relation("CourseAuthor", fields: [authorId], references: [id])
+  enrollments     Enrollment[] 
+  wishlistItems   Wishlist[]  
+
+  @@index([authorId])
+}
+
+model Enrollment {
+  id              String       @id @default(cuid())
+  courseId        String       
+  studentId       String       
+  enrollmentDate  DateTime
+  enrollmentStatus String
+
+  course          Course       @relation(fields: [courseId], references: [id])
+  student         User         @relation(fields: [studentId], references: [id])
+
+ 
+  @@index([courseId])
+  @@index([studentId])
+}
+
+model Wishlist {
+  id          String       @id @default(cuid())
+  userId      String
+  courseId    String       
+  createdAt   DateTime     @default(now())
+
+
+  user        User         @relation(fields: [userId], references: [id])
+  course      Course       @relation(fields: [courseId], references: [id])
+
+  @@index([userId])
+  @@index([courseId])
+}
+
+model Category {
+  id           String       @id @default(cuid())
+  authorId     String
+  name         String       
+  description  String       
+  thumbnail    String       
+  count        String     
+  date         DateTime     @default(now())
+
+  user        User         @relation(fields: [authorId], references: [id])
+  
+  @@index([authorId])
+}
+
