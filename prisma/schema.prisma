@@ -39,6 +39,7 @@ model User {
   courses       Course[]      @relation("CourseAuthor") 
   wishlist      Wishlist[]    
   Category      Category[]    
+  announcements Announcement[]
 }
 
 model Course {
@@ -93,7 +94,7 @@ model Category {
   name         String       
   description  String       
   thumbnail    String       
-  count        String     
+  count        Int     
   date         DateTime     @default(now())
 
   user        User         @relation(fields: [authorId], references: [id])
@@ -101,3 +102,16 @@ model Category {
   @@index([authorId])
 }
 
+model Announcement {
+  id               String      @id @default(cuid())
+  authorId         String
+  date             DateTime    @default(now())
+  course           String
+  title            String
+  summary          String
+  site_notification Boolean    @default(false)
+
+  user             User        @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+}

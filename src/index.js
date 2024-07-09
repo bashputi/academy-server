@@ -21,16 +21,16 @@ app.use(express.json());
 app.use(cors());
 
 
-app.use("/api/user", userRouter)
-app.use("/api/user", settingRouter)
-app.use("/api/admin", coursesRoute)
-app.use("/api/admin", instructorRoute)
-app.use("/api/student", enrollRoute)
-app.use("/api/student", wishlistRoute)
-app.use("/api/admin", categoriesRoute)
-app.use("/api/admin", announcementRoute)
-app.use("/api/admin", blogRoute)
-app.use("/api/email", emailRoute)
+app.use("/api", userRouter)
+app.use("/api", settingRouter)
+app.use("/api", coursesRoute)
+app.use("/api", instructorRoute)
+app.use("/api", enrollRoute)
+app.use("/api", wishlistRoute)
+app.use("/api", categoriesRoute)
+app.use("/api", announcementRoute)
+app.use("/api", blogRoute)
+app.use("/api", emailRoute)
 
 
 

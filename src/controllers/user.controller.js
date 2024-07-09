@@ -225,21 +225,6 @@ const changePassword = catchAsync(async (req, res) => {
     });
 });
 
-// get user by id
-const user = catchAsync(async (req, res) => {
-    const { id } = req.params;
-
-    const foundUser = await prisma.user.findUnique({
-        where: { id: id },
-    });
-
-    if (!foundUser) {
-        throw new ApiErrors(404, "User not found");
-    }
-
-    return res.status(200).json(new ApiResponse(200, foundUser, "Specific user is returned"));
-});
-
 // get all student information 
 const students = catchAsync(async (req, res) => {
     const page = Number(req.query.page) || 1;
@@ -274,6 +259,23 @@ const students = catchAsync(async (req, res) => {
     }
 });
 
+// get user by id
+const user = catchAsync(async (req, res) => {
+    const { id } = req.params;
+
+    const foundUser = await prisma.user.findUnique({
+        where: { id: id },
+    });
+
+    if (!foundUser) {
+        throw new ApiErrors(404, "User not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, foundUser, "Specific user is returned"));
+});
+
+
+
 
 
 
@@ -284,9 +286,10 @@ export {
     login,
     verifyOtp,
     socialLogin,
+    forgetPassword,
+    changePassword,
     students,
     user,
-    forgetPassword,
-    changePassword
+    
     
 };

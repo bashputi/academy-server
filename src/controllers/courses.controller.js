@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 
 // create course 
-const course = async (req, res) => {
+const course = catchAsync(async (req, res) => {
     const { title, description, authorId, content } = req.body;
 
     try {
@@ -28,11 +28,11 @@ const course = async (req, res) => {
             throw new ApiErrors(500, "Failed to add course");
         }
     }
-};
+});
 
 // need to work after create course
 //  get all courses for admin 
-const allCourses = async (req, res) => {
+const allCourses = catchAsync(async (req, res) => {
     const { status, category, date, search } = req.body;
     const sortBy = req.body.sortBy || 'createdAt'; // Default sortBy to createdAt or another valid field
     const sortOrder = req.body.sortOrder || 'asc';
@@ -106,11 +106,12 @@ const allCourses = async (req, res) => {
         error: error.message,
       });
     }
-  };
+  });
 
 // get all course for user
-
-
+const userCourses = catchAsync(async(req, res) => {
+//get published courses
+});
   
   // need to work after create course
 // get specific courses by id for all
@@ -242,6 +243,7 @@ const statusCourses = catchAsync(async (req, res) => {
 export {
     course, 
     allCourses,
+    userCourses,
     specificCourses,
     coursesByCategory,
     deleteCourses,

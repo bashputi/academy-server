@@ -21,7 +21,8 @@ const addWish = catchAsync(async (req, res) => {
       return res.status(200).json(new ApiResponse(200, wishlistItem, 'Added to wishlist successfully'));
   });
 
-//get wishlist by author id
+  // need to change after course table
+//get wishlist by user id
 const specificWishlist = catchAsync(async (req, res) => {
     const { userId } = req.params;
   

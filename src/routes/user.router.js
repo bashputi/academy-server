@@ -10,14 +10,14 @@ import {verifyAdmin} from "../middlewares/auth.middleware.js"
 
 
 
- router.route("/register").post(registerUser);
- router.route("/login").patch(login);
- router.route("/verify-otp").post(verifyOtp);
- router.route("/social-login").post(socialLogin);
- router.route("/forget-password").post(forgetPassword);
- router.route("/change-password").patch(changePassword);
- router.route("/students").get( students);
- router.route("/:id").get(verifyAuth, user);
+ router.route("/user/register").post(registerUser);
+ router.route("/user/login").patch(login);
+ router.route("/user/verify-otp").post(verifyOtp);
+ router.route("/user/social-login").post(socialLogin);
+ router.route("/user/forget-password").post(forgetPassword);
+ router.route("/user/change-password").patch(changePassword);
+ router.route("/admin/students").get(verifyAuth, verifyAdmin, students);
+ router.route("/admin/:id").get(verifyAuth, user);
 
 
 

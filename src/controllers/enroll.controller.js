@@ -120,7 +120,7 @@ const getEnroll = catchAsync(async (req, res) => {
 
 
 // need to change after course create
-//get specific emrollment
+//get specific enrollment for student
 const specificEnrollment = catchAsync(async (req, res) => {
   const { id } = req.params;
 

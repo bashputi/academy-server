@@ -28,7 +28,7 @@ const application = catchAsync(async (req, res) => {
 
 //get the instructors and the applicators for admin
 const instructor = catchAsync(async (req, res) => {
-    const { status, category, date, search } = req.body;
+    const { status, date, search } = req.body;
     const sortBy = req.query.sortBy || 'date';
     const sortOrder = req.query.sortOrder || 'asc';
     const page = Number(req.query.page) || 1;
@@ -62,9 +62,6 @@ const instructor = catchAsync(async (req, res) => {
         };
 
         // Add additional filters
-        if (category) {
-            query.where.category = category;
-        }
         if (date) {
             query.where.date = {
                 equals: date,
