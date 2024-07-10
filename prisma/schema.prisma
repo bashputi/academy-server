@@ -13,63 +13,188 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id            String       @id @default(cuid())
-  firstname     String
-  lastname      String
-  username      String       @unique
-  password      String?
-  email         String       @unique
-  role          String
-  date          DateTime     @default(now())
-  otp           String?
-  skill         String?
-  phone         String?  
-  profileimage  String?
-  coverimage    String?
-  facebook      String?
-  twitter       String?
-  linkedin      String?
-  website       String?
-  github        String?
-  bio           String?
+  id              String         @id @default(cuid())
+  firstname       String
+  lastname        String
+  username        String         @unique
+  password        String?
+  email           String         @unique
+  role            String
+  date            DateTime       @default(now())
+  otp             String?
+  skill           String?
+  phone           String?
+  profileImage    String?
+  coverImage      String?
+  facebook        String?
+  twitter         String?
+  linkedin        String?
+  website         String?
+  github          String?
+  bio             String?
 
-  enrollments   Enrollment[]  
-  courses       Course[]      @relation("CourseAuthor") 
-  wishlist      Wishlist[]    
-  Category      Category[]    
-  announcements Announcement[]
+  enrollments     Enrollment[]
+  courses         Course[]       @relation("courseAuthor")
+  wishlist        Wishlist[]
+  categories      Category[]
+  announcements   Announcement[]
 }
 
+// course model
 model Course {
-  id              String       @id @default(cuid())
-  title           String
-  description     String
-  content         String
-  authorId        String      
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id                  String         @id @default(cuid())
+  authorId            String
+  date                DateTime       @default(now())
+  title               String?
+  about               String?
+  maxStudent          Int?
+  difficultyLevel     String?
+  publicCourse        Boolean?
+  QNA                 Boolean?
+  category            String?
+  price               Price[]
+  thumbnail           String?
+  introVideo          String?
+  courseBuilder       CourseBuilder[]
+  instructors         Instructor[]
+  attachments         Attachment[]
+  additionalData      AdditionalData[]
+  coursePrerequisites String?
+  certificateTemplate String?
 
-
-  author          User         @relation("CourseAuthor", fields: [authorId], references: [id])
-  enrollments     Enrollment[] 
-  wishlistItems   Wishlist[]  
+  author              User           @relation("courseAuthor", fields: [authorId], references: [id])
+  enrollments         Enrollment[]
+  wishlistItems       Wishlist[]
 
   @@index([authorId])
 }
 
+model Price {
+  id         String @id @default(cuid())
+  type       String?
+  regular    Int?
+  discounted Int?
+  courseId   String?
+  course     Course? @relation(fields: [courseId], references: [id])
+}
+
+model CourseBuilder {
+  id            String         @id @default(cuid())
+  topicName     String?
+  topicSummery  String?
+  lessons       Lesson[]
+  quizzes       Quiz[]
+  assignment    Assignment?
+  courseId      String?
+  course        Course? @relation(fields: [courseId], references: [id])
+}
+
+model Lesson {
+  id                String      @id @default(cuid())
+  lessonName        String?
+  lessonContent     String?
+  lessonImage       String?
+  lessonVideo       String?
+  videoTime         String?
+  lessonAttachments Attachment[]
+  courseBuilderId   String?
+  courseBuilder     CourseBuilder? @relation(fields: [courseBuilderId], references: [id])
+}
+
+model Attachment {
+  id              String    @id @default(cuid())
+  url             String?
+  courseId        String?
+  lessonId        String?
+  course          Course?   @relation(fields: [courseId], references: [id])
+  lesson          Lesson?   @relation(fields: [lessonId], references: [id])
+}
+
+model Quiz {
+  id              String         @id @default(cuid())
+  quizName        String?
+  quizSummery     String?
+  quizQuestions   QuizQuestion[]
+  quizSettingsId  String?        @unique
+  quizSettings    QuizSettings?  @relation(fields: [quizSettingsId], references: [id])
+  courseBuilderId String?
+  courseBuilder   CourseBuilder? @relation(fields: [courseBuilderId], references: [id])
+}
+
+model QuizQuestion {
+  id              String      @id @default(cuid())
+  question        String?
+  questionType    String?
+  answerRequired  Boolean?
+  point           Int?
+  description     String?
+  answer          String?
+  quizId          String?
+  quiz            Quiz?       @relation(fields: [quizId], references: [id])
+}
+
+model QuizSettings {
+  id                       String @id @default(cuid())
+  timeLimit                Int?
+  quizFeedback             String?
+  attemptsAllowed          Int?
+  passingGrade             Int?
+  maxQuestion              Int?
+  autoStart                Boolean?
+  questionLayout           String?
+  randomOrder              String?
+  hideQuestionNumber       Boolean?
+  shortAnswerCharacters    Int?
+  essayQuestionAnswerLimit Boolean?
+  quiz                     Quiz?
+}
+
+model Assignment {
+  id               String      @id @default(cuid())
+  title            String?
+  summary          String?
+  attachments      String?
+  timeLimit        String?
+  totalPoint       Int?
+  minimumPassPoint Int?
+  allowUpload      Int?
+  maximumFileSize  Int?
+  courseBuilderId  String?     @unique
+  courseBuilder    CourseBuilder? @relation(fields: [courseBuilderId], references: [id])
+}
+
+model Instructor {
+  id        String @id @default(cuid())
+  name      String?
+  email     String?
+  courseId  String?
+  course    Course? @relation(fields: [courseId], references: [id])
+}
+
+model AdditionalData {
+  id               String   @id @default(cuid())
+  willLearn        String?
+  targetAudience   String?
+  courseDuration   String?
+  materials        String?
+  requirements     String?
+  tags             String?
+  courseId         String?
+  course           Course?  @relation(fields: [courseId], references: [id])
+}
+// end of course model
+
 model Enrollment {
-  id              String       @id @default(cuid())
+  id              String     @id @default(cuid())
   courseId        String       
   studentId       String       
   enrollmentDate  DateTime
   enrollmentStatus String
 
-  course          Course       @relation(fields: [courseId], references: [id])
-  student         User         @relation(fields: [studentId], references: [id])
+  course          Course     @relation(fields: [courseId], references: [id])
+  student         User       @relation(fields: [studentId], references: [id])
 
- 
   @@index([courseId])
   @@index([studentId])
 }
@@ -79,7 +204,6 @@ model Wishlist {
   userId      String
   courseId    String       
   createdAt   DateTime     @default(now())
-
 
   user        User         @relation(fields: [userId], references: [id])
   course      Course       @relation(fields: [courseId], references: [id])
@@ -97,21 +221,21 @@ model Category {
   count        Int     
   date         DateTime     @default(now())
 
-  user        User         @relation(fields: [authorId], references: [id])
+  user         User         @relation(fields: [authorId], references: [id])
   
   @@index([authorId])
 }
 
 model Announcement {
-  id               String      @id @default(cuid())
-  authorId         String
-  date             DateTime    @default(now())
-  course           String
-  title            String
-  summary          String
-  site_notification Boolean    @default(false)
+  id                String      @id @default(cuid())
+  authorId          String
+  date              DateTime    @default(now())
+  course            String
+  title             String
+  summary           String
+  siteNotification  Boolean     @default(false)
 
-  user             User        @relation(fields: [authorId], references: [id])
+  user              User        @relation(fields: [authorId], references: [id])
 
   @@index([authorId])
 }

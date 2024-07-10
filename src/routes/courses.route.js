@@ -9,7 +9,7 @@ import {verifyInstructor} from "../middlewares/auth.middleware.js"
 import {verifyAdmin} from "../middlewares/auth.middleware.js"
 
 
- router.route("/addcourse").post(verifyAuth, course); 
+ router.route("/addcourse").post( course); 
  router.route("/getcourses").get(verifyAuth, allCourses); 
  router.route("/specific_courses/:id").get( specificCourses); 
  router.route("/category_course").get(coursesByCategory); 

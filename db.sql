@@ -114,89 +114,200 @@ npx prisma migrate dev --name create_user_schema
 
 -- course data structer 
 {
-"id": "623tu263er2763erfcd632",
-"title": "text",
-"about": "html text",
-"max_student": number,
-"difficulty_level": "beginner/ intermediate"
-"public": boolean,
-"QNA": boolean,
-"category": "programming",
-"price": {
-      "type": "Paid",
-      "regular": 1000,
-      "discounted": 800
-    },
-"thumbnail": "https://sldlk.jpg",
-"intro_video": "https://sldlk.jpg",
-"course_builder": [
+  "id": "623tu263er2763erfcd632",
+  "authorId": "text",
+  "title": "text",
+  "about": "html text",
+  "max_student": "number",
+  "difficulty_level": "text",
+  "public_course": "boolean",
+  "QNA": "boolean",
+  "category": "text",
+  "price": {
+    "type": "Paid/free",
+    "regular": 1000,
+    "discounted": 800
+  },
+  "thumbnail": "https://sldlk.jpg",
+  "intro_video": "https://sldlk.jpg",
+  "course_builder": [
     {
-       "topic_name": "text",
-       "topic_summery": "text",
-        "lesson": [
-         {  
-            "lesson_name": "text",
-            "lesson_content": "html text",
-            "lesson_image": "https://sldlk.jpg",
-            "lesson_video": "https://sldlk.jpg",
-            "video_time": "text",
-            "lesson_attechments": [
-                "https://example.com/attachment1.jpg",
-                "https://example.com/attachment2.jpg"
-                ]
-         },
-         {  
-            "lesson_name": "text",
-            "lesson_content": "html text",
-            "lesson_image": "https://sldlk.jpg",
-            "lesson_video": "https://sldlk.jpg",
-            "video_time": "text",
-            "lesson_attechments": [
-                "https://example.com/attachment1.jpg",
-                "https://example.com/attachment2.jpg"
-                ]
-         }
-        ],
-        "quiz": [
+      "topic_name": "text",
+      "topic_summery": "text",
+      "lesson": [
+        {
+          "lesson_name": "text",
+          "lesson_content": "html text",
+          "lesson_image": "https://sldlk.jpg",
+          "lesson_video": "https://sldlk.jpg",
+          "video_time": "text",
+          "lesson_attechments": [
+            "https://example.com/attachment1.jpg",
+            "https://example.com/attachment2.jpg"
+          ]
+        },
+        {
+          "lesson_name": "text",
+          "lesson_content": "html text",
+          "lesson_image": "https://sldlk.jpg",
+          "lesson_video": "https://sldlk.jpg",
+          "video_time": "text",
+          "lesson_attechments": [
+            "https://example.com/attachment1.jpg",
+            "https://example.com/attachment2.jpg"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "quiz_name": "text",
+          "quiz_summery": "text",
+          "quiz_question": [
             {
-                "quiz_name": "text",
-                "quiz_summery": "text",
-                "quiz_question": [
-                    {
-                        "question": "text",
-                        "question_type": "text",
-                        "answer_required": boolean,
-                        "point": number,
-                        "description": "text",
-                        
-                    }
-                ],
-                
+              "question": "text",
+              "question_type": "text",
+              "answer_required": "boolean",
+              "point": "number",
+              "description": "text",
+              "answer": "text"
             },
-        ],
-        "assignments": ,
-    }
-],
-"instructors": [
-      {
-        "name": "Author 1",
-        "email": "author1@example.com"
-      },
-      {
-        "name": "Author 2",
-        "email": "author2@example.com"
+            {
+              "question": "text",
+              "question_type": "text",
+              "answer_required": "boolean",
+              "point": "number",
+              "description": "text",
+              "answer": "text"
+            }
+          ],
+          "quiz_settings": {
+            "time_limit": "number",
+            "quiz_feedback": "text",
+            "attempts_allowed": "number",
+            "passing_grade": "number",
+            "max_question": "number",
+            "advance_settings": {
+              "auto_start": "boolean",
+              "question_layout": "text",
+              "random_order": "text",
+              "hide_question_number": "boolean",
+              "short_answer_characters": "number",
+              "essay_question_answer_limit": "boolean"
+            }
+          }
+        }
+      ],
+      "assignments": {
+        "title": "text",
+        "summary": "text",
+        "attachments": "text",
+        "time_limit": "text",
+        "total_point": "number",
+        "minimum_pass_point": "number",
+        "allow_upload": "number",
+        "maximum_file_size": "number"
       }
-    ],
-"attachments": [
-      "https://example.com/attachment1.jpg",
-      "https://example.com/attachment2.jpg"
-    ],
-"will_learn": "text",
-"target_audience": "text",
-"course_duration": "text",
-"materials": "text",
-"requirement": "text",
-"tags": ["tag1", "tag2"],
-"prerequisites": ["course1", "course2"],
-"certificate_template": "https://sldlk.jpg"
+    },
+    {
+      "topic_name": "text",
+      "topic_summery": "text",
+      "lesson": [
+        {
+          "lesson_name": "text",
+          "lesson_content": "html text",
+          "lesson_image": "https://sldlk.jpg",
+          "lesson_video": "https://sldlk.jpg",
+          "video_time": "text",
+          "lesson_attechments": [
+            "https://example.com/attachment1.jpg",
+            "https://example.com/attachment2.jpg"
+          ]
+        },
+        {
+          "lesson_name": "text",
+          "lesson_content": "html text",
+          "lesson_image": "https://sldlk.jpg",
+          "lesson_video": "https://sldlk.jpg",
+          "video_time": "text",
+          "lesson_attechments": [
+            "https://example.com/attachment1.jpg",
+            "https://example.com/attachment2.jpg"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "quiz_name": "text",
+          "quiz_summery": "text",
+          "quiz_question": [
+            {
+              "question": "text",
+              "question_type": "text",
+              "answer_required": "boolean",
+              "point": "number",
+              "description": "text",
+              "answer": "text"
+            },
+            {
+              "question": "text",
+              "question_type": "text",
+              "answer_required": "boolean",
+              "point": "number",
+              "description": "text",
+              "answer": "text"
+            }
+          ],
+          "quiz_settings": {
+            "time_limit": "number",
+            "quiz_feedback": "text",
+            "attempts_allowed": "number",
+            "passing_grade": "number",
+            "max_question": "number",
+            "advance_settings": {
+              "auto_start": "boolean",
+              "question_layout": "text",
+              "random_order": "text",
+              "hide_question_number": "boolean",
+              "short_answer_characters": "number",
+              "essay_question_answer_limit": "boolean"
+            }
+          }
+        }
+      ],
+      "assignments": {
+        "title": "text",
+        "summary": "text",
+        "attachments": "text",
+        "time_limit": "text",
+        "total_point": "number",
+        "minimum_pass_point": "number",
+        "allow_upload": "number",
+        "maximum_file_size": "number"
+      }
+    }
+  ],
+  "instructors": [
+    {
+      "name": "Author 1",
+      "email": "author1@example.com"
+    },
+    {
+      "name": "Author 2",
+      "email": "author2@example.com"
+    }
+  ],
+  "attachments": [
+    "https://example.com/attachment1.jpg",
+    "https://example.com/attachment2.jpg"
+  ],
+  "additional_data": {
+    "will_learn": "text",
+    "target_audience": "text",
+    "course_duration": "text",
+    "materials": "text",
+    "requirements": "text",
+    "tags": ["tag1", "tag2"]
+  },
+  "course_prerequisites": ["course1", "course2"],
+  "certificate_template": "text"
 }

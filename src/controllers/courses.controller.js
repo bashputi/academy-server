@@ -6,29 +6,136 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 // create course 
 const course = catchAsync(async (req, res) => {
-    const { title, description, authorId, content } = req.body;
+  try {
+    const {
+        title,
+        about,
+        authorId,
+        maxStudent,
+        difficultyLevel,
+        publicCourse,
+        QNA,
+        category,
+        price,
+        thumbnail,
+        introVideo,
+        courseBuilder, // This should be an array of dynamic objects
+        instructors,
+        attachments,
+        additionalData,
+        coursePrerequisites,
+        certificateTemplate
+    } = req.body;
 
-    try {
-        const newCourse = await prisma.course.create({
-            data: {
-                title,
-                description,
-                content,
-                authorId,
-                createdAt: new Date(), 
-                updatedAt: new Date() 
+  
+    const prepareCourseBuilderData = (courseBuilder) => {
+      if (!Array.isArray(courseBuilder)) {
+        throw new Error('courseBuilder must be an array');
+      }
+
+      return courseBuilder.map(builder => {
+        const { topicName, topicSummery, lessons = [], quizzes = [], assignment = null } = builder;
+
+        return {
+          topicName,
+          topicSummery,
+          lessons: {
+            create: lessons.map(lesson => ({
+              lessonName: lesson.lessonName,
+              lessonContent: lesson.lessonContent,
+              lessonImage: lesson.lessonImage,
+              lessonVideo: lesson.lessonVideo,
+              videoTime: lesson.videoTime,
+              lessonAttachments: {
+                create: lesson.lessonAttachments
+              }
+            }))
+          },
+          quizzes: {
+            create: quizzes.map(quiz => ({
+              quizName: quiz.quizName,
+              quizSummery: quiz.quizSummery,
+              quizQuestions: {
+                create: quiz.quizQuestions.map(question => ({
+                  question: question.question,
+                  questionType: question.questionType,
+                  answerRequired: question.answerRequired,
+                  point: question.point,
+                  description: question.description,
+                  answer: question.answer
+                }))
+              },
+              quizSettings: {
+                create: { ...quiz.quizSettings }
+              }
+            }))
+          },
+          assignment: assignment ? {
+            create: {
+              title: assignment.title,
+              summary: assignment.summary,
+              attachments: assignment.attachments,
+              timeLimit: assignment.timeLimit,
+              totalPoint: assignment.totalPoint,
+              minimumPassPoint: assignment.minimumPassPoint,
+              allowUpload: assignment.allowUpload,
+              maximumFileSize: assignment.maximumFileSize
             }
-        });
+          } : null
+        };
+      });
+    };
 
-        return res.status(200).json(new ApiResponse(200, { newCourse }, "Course added successfully"));
-    } catch (error) {
-        if (error.code === 'P2002' && error.meta?.target.includes('title_unique')) {
-            throw new ApiErrors(400, "Course title already exists");
-        } else {
-            throw new ApiErrors(500, "Failed to add course");
-        }
-    }
+    const course = await prisma.course.create({
+      data: {
+        title,
+        about,
+        authorId,
+        maxStudent,
+        difficultyLevel,
+        publicCourse,
+        QNA,
+        category,
+        price: {
+          create: {
+            type: price.type,
+            regular: price.regular,
+            discounted: price.discounted
+          }
+        },
+        thumbnail,
+        introVideo,
+        courseBuilder: {
+          create: prepareCourseBuilderData(courseBuilder)
+        },
+        instructors: {
+          create: instructors.map(instructor => ({
+            name: instructor.name,
+            email: instructor.email
+          }))
+        },
+        attachments: {
+          createMany: {
+            data: attachments
+          }
+        },
+        additionalData: {
+          createMany: {
+            data: [additionalData]
+          }
+        },
+        coursePrerequisites,
+        certificateTemplate
+      }
+    });
+
+    res.status(200).json({ success: true, data: course  });
+} catch (error) {
+    console.error("Error creating course:", error);
+     res.status(500).json({ success: false, message: "Failed to create course", error: error.message });
+}
 });
+
 
 // need to work after create course
 //  get all courses for admin 
