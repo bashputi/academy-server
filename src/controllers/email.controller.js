@@ -1,6 +1,6 @@
 import { contactUsEmail } from "../utils/email.js";
 import catchAsync from '../utils/catchAsync.js';
-
+import { ApiResponse } from "../utils/apiResponse.js";
 
 // sent email to admin from frontend
 const sendEmail = catchAsync(async (req, res) => {
@@ -13,7 +13,7 @@ const sendEmail = catchAsync(async (req, res) => {
         email: email
     };
     contactUsEmail(userData); 
-    res.status(200).json({ success: true, message: "Email sent successfully" });
+    return res.status(200).json(new ApiResponse(200, 'Email sent successfully'));
 });
 
 

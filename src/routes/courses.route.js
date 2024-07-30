@@ -10,8 +10,8 @@ import {verifyAdmin} from "../middlewares/auth.middleware.js"
 
 
  router.route("/addcourse").post( course); 
- router.route("/getcourses").get(verifyAuth, allCourses); 
- router.route("/specific_courses/:id").get( specificCourses); 
+ router.route("/getcourses").get( allCourses); 
+ router.route("/specific_courses").get(specificCourses); 
  router.route("/category_course").get(coursesByCategory); 
  router.route("/delete_courses/:id").delete(verifyAuth, deleteCourses); 
  router.route("/edit_course/:id").patch(verifyAuth, verifyInstructor, editCourses); 

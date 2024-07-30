@@ -114,200 +114,125 @@ npx prisma migrate dev --name create_user_schema
 
 -- course data structer 
 {
-  "id": "623tu263er2763erfcd632",
-  "authorId": "text",
-  "title": "text",
-  "about": "html text",
-  "max_student": "number",
-  "difficulty_level": "text",
-  "public_course": "boolean",
-  "QNA": "boolean",
-  "category": "text",
-  "price": {
-    "type": "Paid/free",
-    "regular": 1000,
-    "discounted": 800
-  },
-  "thumbnail": "https://sldlk.jpg",
-  "intro_video": "https://sldlk.jpg",
-  "course_builder": [
+  "title": "Introduction to Programming",
+  "about": "Learn the basics of programming with this comprehensive course.",
+  "authorId": "cly10ew8n0000145ylto2efzn",
+  "maxStudent": 50,
+  "difficultyLevel": "Beginner",
+  "publicCourse": true,
+  "QNA": true,
+  "category": "Programming",
+  "price": [
     {
-      "topic_name": "text",
-      "topic_summery": "text",
-      "lesson": [
+      "type": "Paid",
+      "regular": 100,
+      "discounted": 80
+    }
+  ],
+  "thumbnail": "https://example.com/thumbnail.jpg",
+  "introVideo": "https://example.com/intro_video.mp4",
+  "courseBuilder": [
+    {
+      "topicName": "Introduction",
+      "topicSummery": "Introduction to the course",
+      "lessons": [
         {
-          "lesson_name": "text",
-          "lesson_content": "html text",
-          "lesson_image": "https://sldlk.jpg",
-          "lesson_video": "https://sldlk.jpg",
-          "video_time": "text",
-          "lesson_attechments": [
-            "https://example.com/attachment1.jpg",
-            "https://example.com/attachment2.jpg"
+          "lessonName": "Variables and Data Types",
+          "lessonContent": "<p>Learn about variables, strings, numbers, and booleans.</p>",
+          "lessonImage": "https://example.com/lesson1.jpg",
+          "lessonVideo": "https://example.com/lesson1.mp4",
+          "videoTime": "10:00",
+          "lessonAttachments": [
+            {
+              "url": "https://example.com/attachment1.pdf"
+            },
+            {
+              "url": "https://example.com/attachment2.pdf"
+            }
           ]
         },
         {
-          "lesson_name": "text",
-          "lesson_content": "html text",
-          "lesson_image": "https://sldlk.jpg",
-          "lesson_video": "https://sldlk.jpg",
-          "video_time": "text",
-          "lesson_attechments": [
-            "https://example.com/attachment1.jpg",
-            "https://example.com/attachment2.jpg"
+          "lessonName": "Control Flow",
+          "lessonContent": "<p>Understand if statements, loops, and switch statements.</p>",
+          "lessonImage": "https://example.com/lesson2.jpg",
+          "lessonVideo": "https://example.com/lesson2.mp4",
+          "videoTime": "15:00",
+          "lessonAttachments": [
+            {
+              "url": "https://example.com/attachment3.pdf"
+            }
           ]
         }
       ],
-      "quiz": [
+      "quizzes": [
         {
-          "quiz_name": "text",
-          "quiz_summery": "text",
-          "quiz_question": [
+          "quizName": "Programming Basics Quiz",
+          "quizSummery": "Test your knowledge of basic programming concepts.",
+          "quizQuestions": [
             {
-              "question": "text",
-              "question_type": "text",
-              "answer_required": "boolean",
-              "point": "number",
-              "description": "text",
-              "answer": "text"
+              "question": "What is a variable?",
+              "questionType": "Multiple Choice",
+              "answerRequired": true,
+              "point": 10,
+              "description": "Define what a variable is in programming.",
+              "answer": "A variable is a named storage location capable of holding data."
             },
             {
-              "question": "text",
-              "question_type": "text",
-              "answer_required": "boolean",
-              "point": "number",
-              "description": "text",
-              "answer": "text"
+              "question": "What does 'if' statement do?",
+              "questionType": "Multiple Choice",
+              "answerRequired": true,
+              "point": 10,
+              "description": "Explain the purpose of 'if' statements in programming.",
+              "answer": "'if' statements execute a block of code if a specified condition is true."
             }
           ],
-          "quiz_settings": {
-            "time_limit": "number",
-            "quiz_feedback": "text",
-            "attempts_allowed": "number",
-            "passing_grade": "number",
-            "max_question": "number",
-            "advance_settings": {
-              "auto_start": "boolean",
-              "question_layout": "text",
-              "random_order": "text",
-              "hide_question_number": "boolean",
-              "short_answer_characters": "number",
-              "essay_question_answer_limit": "boolean"
-            }
+          "quizSettings": {
+            "timeLimit": 30,
+            "quizFeedback": "Detailed feedback will be provided after quiz completion.",
+            "attemptsAllowed": 3,
+            "passingGrade": 70,
+            "maxQuestion": 10,
+            "autoStart": true,
+            "questionLayout": "Single Column",
+            "randomOrder": "Yes",
+            "hideQuestionNumber": false,
+            "shortAnswerCharacters": 100,
+            "essayQuestionAnswerLimit": false
+            
           }
         }
       ],
-      "assignments": {
-        "title": "text",
-        "summary": "text",
-        "attachments": "text",
-        "time_limit": "text",
-        "total_point": "number",
-        "minimum_pass_point": "number",
-        "allow_upload": "number",
-        "maximum_file_size": "number"
-      }
-    },
-    {
-      "topic_name": "text",
-      "topic_summery": "text",
-      "lesson": [
-        {
-          "lesson_name": "text",
-          "lesson_content": "html text",
-          "lesson_image": "https://sldlk.jpg",
-          "lesson_video": "https://sldlk.jpg",
-          "video_time": "text",
-          "lesson_attechments": [
-            "https://example.com/attachment1.jpg",
-            "https://example.com/attachment2.jpg"
-          ]
-        },
-        {
-          "lesson_name": "text",
-          "lesson_content": "html text",
-          "lesson_image": "https://sldlk.jpg",
-          "lesson_video": "https://sldlk.jpg",
-          "video_time": "text",
-          "lesson_attechments": [
-            "https://example.com/attachment1.jpg",
-            "https://example.com/attachment2.jpg"
-          ]
-        }
-      ],
-      "quiz": [
-        {
-          "quiz_name": "text",
-          "quiz_summery": "text",
-          "quiz_question": [
-            {
-              "question": "text",
-              "question_type": "text",
-              "answer_required": "boolean",
-              "point": "number",
-              "description": "text",
-              "answer": "text"
-            },
-            {
-              "question": "text",
-              "question_type": "text",
-              "answer_required": "boolean",
-              "point": "number",
-              "description": "text",
-              "answer": "text"
-            }
-          ],
-          "quiz_settings": {
-            "time_limit": "number",
-            "quiz_feedback": "text",
-            "attempts_allowed": "number",
-            "passing_grade": "number",
-            "max_question": "number",
-            "advance_settings": {
-              "auto_start": "boolean",
-              "question_layout": "text",
-              "random_order": "text",
-              "hide_question_number": "boolean",
-              "short_answer_characters": "number",
-              "essay_question_answer_limit": "boolean"
-            }
-          }
-        }
-      ],
-      "assignments": {
-        "title": "text",
-        "summary": "text",
-        "attachments": "text",
-        "time_limit": "text",
-        "total_point": "number",
-        "minimum_pass_point": "number",
-        "allow_upload": "number",
-        "maximum_file_size": "number"
+      "assignment": {
+        "title": "Programming Assignment",
+        "summary": "Complete the programming assignment to apply what you've learned.",
+        "attachments": "Submit your assignment in PDF format.",
+        "timeLimit": "7 days",
+        "totalPoint": 100,
+        "minimumPassPoint": 70,
+        "allowUpload": 1,
+        "maximumFileSize": 5
       }
     }
   ],
   "instructors": [
     {
-      "name": "Author 1",
-      "email": "author1@example.com"
-    },
-    {
-      "name": "Author 2",
-      "email": "author2@example.com"
+      "name": "John Doe",
+      "email": "johndoe@example.com"
     }
   ],
   "attachments": [
-    "https://example.com/attachment1.jpg",
-    "https://example.com/attachment2.jpg"
+    {
+      "url": "https://example.com/attachment4.pdf"
+    }
   ],
-  "additional_data": {
-    "will_learn": "text",
-    "target_audience": "text",
-    "course_duration": "text",
-    "materials": "text",
-    "requirements": "text",
-    "tags": ["tag1", "tag2"]
+  "additionalData": {
+    "willLearn": "Basic programming concepts",
+    "targetAudience": "Beginners interested in learning programming",
+    "courseDuration": "4 weeks",
+    "materials": "Slides, exercises, quizzes",
+    "requirements": "No prior programming experience required",
+    "tags": "Programming, Beginner, Coding"
   },
-  "course_prerequisites": ["course1", "course2"],
-  "certificate_template": "text"
+  "coursePrerequisites": "None",
+  "certificateTemplate": "https://example.com/certificate_template.pdf"
 }

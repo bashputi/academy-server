@@ -9,8 +9,8 @@ import {verifyAdmin} from "../middlewares/auth.middleware.js"
 
 
  router.route("/blog").post(verifyAuth, addBlog); 
- router.route("/getblog").get( allBlog); 
- router.route("/specificBlog/:id").get(specificBlog); 
+ router.route("/get_blog").get( allBlog); 
+ router.route("/specific_blog/:id").get(specificBlog); 
 
  
 

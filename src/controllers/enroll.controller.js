@@ -44,7 +44,7 @@ const enrollCourses = catchAsync(async (req, res) => {
     }
   
     return res.status(200).json(new ApiResponse(200, enrollment, 'Enrollment successful'));
-  });
+});
 
 // get all enroll for admin
 const getEnroll = catchAsync(async (req, res) => {
@@ -110,21 +110,15 @@ const getEnroll = catchAsync(async (req, res) => {
       totalPages: Math.ceil(totalEnrollments / limit),
     };
 
-    // Respond with the formatted enrollment data
     return res.status(200).json(new ApiResponse(200, data, 'Enrollments retrieved successfully'));
   } catch (error) {
-    console.error('Error retrieving enrollments:', error.message);
     throw new ApiErrors(500, `An internal server error occurred: ${error.message}`);
   }
 });
 
-
-// need to change after course create
-//get specific enrollment for student
+//get specific enrollment for student by studentId
 const specificEnrollment = catchAsync(async (req, res) => {
   const { id } = req.params;
-
-  // Fetch specific enrollment using Prisma
   const enrollment = await prisma.enrollment.findMany({
     where: {
       studentId: id,
@@ -136,14 +130,20 @@ const specificEnrollment = catchAsync(async (req, res) => {
 
   // Check if enrollment exists
   if (!enrollment) {
-    return res.status(404).json({ message: 'Enrollment not found' });
+    throw new ApiErrors(404, 'Enrollment not found');
   }
-
+  const transformedData = enrollment.map(item => ({
+    id: item.id,
+    studentId: item.studentId,
+    courseId: item.course.id, 
+    authorId: item.course.authorId,  
+    title: item.course.title,  
+    thumbnail: item.course.thumbnail,
+    category: item.course.category,
+    date: item.course.date  
+  }));
   // Respond with the formatted enrollment data
-  return res.status(200).json({
-    message: 'Specific enrollment returned',
-   enrollment
-  });
+  return res.status(200).json(new ApiResponse(200, transformedData, 'Enrolled course return successfully'));
 });
 
 

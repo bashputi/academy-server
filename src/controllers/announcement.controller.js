@@ -15,7 +15,6 @@ const addAnnouncement = catchAsync(async (req, res) => {
     try {
         const newAnnouncement = await prisma.announcement.create({
             data: {
-                id: uuidv4(),
                 course,
                 summary,
                 title,

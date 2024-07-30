@@ -129,16 +129,14 @@ const course = catchAsync(async (req, res) => {
       }
     });
 
-    res.status(200).json({ success: true, data: course  });
+    return res.status(200).json(new ApiResponse(200, course, 'Course created successfully'));
 } catch (error) {
     console.error("Error creating course:", error);
      res.status(500).json({ success: false, message: "Failed to create course", error: error.message });
 }
 });
 
-
-// need to work after create course
-//  get all courses for admin 
+//  get all courses  
 const allCourses = catchAsync(async (req, res) => {
     const { status, category, date, search } = req.body;
     const sortBy = req.body.sortBy || 'createdAt'; // Default sortBy to createdAt or another valid field
@@ -150,7 +148,6 @@ const allCourses = catchAsync(async (req, res) => {
     try {
       // Prisma filtering and pagination
       const coursesQuery = {
-       
         take: limit,  // Limit results per page
         skip: skip,   // Offset based on pagination
       };
@@ -200,27 +197,12 @@ const allCourses = catchAsync(async (req, res) => {
       };
   
       // Respond with success
-      return res.status(200).json({
-        statusCode: 200,
-        data,
-        message: "Courses retrieved successfully",
-        success: true,
-      });
+      return res.status(200).json(new ApiResponse(200, data, 'Courses retrieved successfully'));
     } catch (error) {
-      console.error("Error retrieving courses:", error.message);
-      return res.status(500).json({
-        message: "Error retrieving courses",
-        error: error.message,
-      });
+      throw new ApiErrors(404, 'Error retrieving courses');
     }
-  });
-
-// get all course for user
-const userCourses = catchAsync(async(req, res) => {
-//get published courses
 });
-  
-  // need to work after create course
+
 // get specific courses by id for all
 const specificCourses = catchAsync(async (req, res) => {
     const { id, authorId } = req.body;
@@ -233,10 +215,9 @@ const specificCourses = catchAsync(async (req, res) => {
         where: {
           authorId: authorId,
         },
-        select: {
-            title: true,
-            description: true,
-          },
+        include: {
+          course: true, 
+        },
       });
     } else if (id) {
       // Fetch courses by courseId (id)
@@ -244,7 +225,28 @@ const specificCourses = catchAsync(async (req, res) => {
         where: {
           id: id,
         },
-      });
+    include: {
+    price: true,
+    courseBuilder: {
+      include: {
+        lessons: {
+          include: {
+            lessonAttachments: true
+          }
+        },
+        quizzes: {
+          include: {
+            quizQuestions: true,
+            quizSettings: true
+          },
+              },
+        assignment: true,
+      }
+    },
+    additionalData: true,
+    instructors: true,
+    attachments: true,
+    }});
     } else {
      throw new ApiErrors(400, "Invalid request. Provide either authorId or id.");
       
@@ -255,7 +257,7 @@ const specificCourses = catchAsync(async (req, res) => {
     } else {
    throw new ApiErrors(404, "No courses found"); 
     }
-  });
+});
 
 // get specific courses by id for all
 const coursesByCategory = catchAsync(async (req, res) => {
@@ -280,7 +282,7 @@ const coursesByCategory = catchAsync(async (req, res) => {
     } else {
       throw new ApiErrors(404, "No courses found");
     }
-  });
+});
 
 // delete courses 
 const deleteCourses = catchAsync(async (req, res) => {
@@ -298,7 +300,7 @@ const deleteCourses = catchAsync(async (req, res) => {
     }
   
     return res.status(200).json(new ApiResponse(200, {}, 'Course deleted successfully'));
-  });
+});
 
   // need to work after create course
 // edit course by id
@@ -321,7 +323,7 @@ const editCourses = catchAsync(async (req, res) => {
         throw new ApiErrors(404, 'Course not found');
       }
       return res.status(200).json(new ApiResponse(200, updatedCourse, 'Course edited successfully.')); 
-  });
+});
 
 // change publish status 
 const statusCourses = catchAsync(async (req, res) => {
@@ -341,7 +343,7 @@ const statusCourses = catchAsync(async (req, res) => {
         throw new ApiErrors(404, 'Course not found');
       }
       return res.status(200).json(new ApiResponse(200, updatedCourse, 'Course status updated successfully.'));
-  });
+});
 
 
 
@@ -350,7 +352,6 @@ const statusCourses = catchAsync(async (req, res) => {
 export {
     course, 
     allCourses,
-    userCourses,
     specificCourses,
     coursesByCategory,
     deleteCourses,

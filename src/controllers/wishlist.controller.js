@@ -21,7 +21,6 @@ const addWish = catchAsync(async (req, res) => {
       return res.status(200).json(new ApiResponse(200, wishlistItem, 'Added to wishlist successfully'));
   });
 
-  // need to change after course table
 //get wishlist by user id
 const specificWishlist = catchAsync(async (req, res) => {
     const { userId } = req.params;
@@ -38,11 +37,19 @@ const specificWishlist = catchAsync(async (req, res) => {
       if (wishlistItems.length === 0) {
         throw new ApiErrors(404, 'No wishlist items found for this user');
       }
-      const data = {
-
-      }
-  
-      return res.status(200).json(new ApiResponse(200, data, 'Wishlist items retrieved successfully'));
+      const transformedData = wishlistItems.map(item => ({
+        id: item.id,
+        userId: item.userId,
+        createdAt: item.createdAt,
+        courseId: item.course.id, 
+        authorId: item.course.authorId,  
+        title: item.course.title,  
+        thumbnail: item.course.thumbnail,
+        category: item.course.category,
+        date: item.course.date  
+      }));
+      
+      return res.status(200).json(new ApiResponse(200, transformedData, 'Wishlist items retrieved successfully'));
     } 
   );
 
